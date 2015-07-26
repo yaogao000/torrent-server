@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import com.drink.common.web.ResponseMessssage;
 import com.drink.common.web.filter.AbstractFirstFilter;
 import com.drink.srv.CustomerSrv;
-import com.drink.srv.support.SrvException;
 
 /**
  * 
@@ -20,8 +19,8 @@ public class FirstFilter extends AbstractFirstFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(FirstFilter.class);
 
-	// @Autowired
-	// private CustomerSrv.Iface customerSrv;
+	 @Autowired
+	 private CustomerSrv.Iface customerSrv;
 
 	/**
 	 * 根据token 取得 secret
@@ -32,9 +31,7 @@ public class FirstFilter extends AbstractFirstFilter {
 				logger.info(String.format("FirstFilter-->getAccessSecret: The parameter token [%s] is null or empty.", key));
 				return null;
 			}
-			// String secret = this.customerSrv.getSecretByToken(key);
-			String secret = "secret";
-			return secret;
+			return this.customerSrv.getSecretByToken(key);
 		} catch (Exception e) {
 			logger.error(String.format("FirstFilter-->getAccessSecret for token[%s] error", key), e);
 			throw new RuntimeException(String.format("FirstFilter-->getAccessSecret for token[%s] error", key), e);

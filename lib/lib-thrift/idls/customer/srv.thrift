@@ -7,5 +7,5 @@ service CustomerSrv {
 
 	string getSecretByToken(1: required string token) throws(1: exp.SrvException ex);
 
-	i16 signIn(1: required string phone, 2: required string password);
+	#i16 signIn(1: required string phone, 2: required string password);
 }

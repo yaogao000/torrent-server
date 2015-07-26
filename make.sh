@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mvn clean compile install
+mvn clean compile install -Dmaven.test.skip=true

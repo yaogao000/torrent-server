@@ -1,5 +1,3 @@
 #!/bin/bash
 
-sh ./idls/gen.sh
-
-mvn clean install
+cd `dirname $0` && sh ./idls/gen.sh && mvn clean install
