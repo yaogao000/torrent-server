@@ -19,7 +19,7 @@ import com.drink.srv.info.CustomerSession;
 // @Ignore
 public class CustomerSessionMapperTest {
 	@Autowired
-	private CustomerSessionMapper custoemrSessionMapper;
+	private CustoemrSessionMapper custoemrSessionMapper;
 
 	@Test
 	public void testGetSessionByToken() {
