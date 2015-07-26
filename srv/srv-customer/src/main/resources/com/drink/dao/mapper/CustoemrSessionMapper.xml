@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 这里的namespace名字必须为执行该sql的dao地址&nbsp; -->
+<mapper namespace="com.drink.dao.mapper.CustomerSessionMapper">
+	<resultMap id="customerSessionMap" type="com.drink.srv.info.CustomerSession" >
+		<result property="cid" 			column="cid"/>
+		<result property="token" 		column="token"/>
+		<result property="secret" 		column="secret" />
+		<result property="client" 		column="client" />
+		<result property="lat" 			column="lat"/>
+		<result property="lng" 			column="lng"/>
+		<result property="expire_at" 	column="expireAt"/>
+	</resultMap>
+	
+    <select id="getSessionByToken" parameterType="String" resultMap="customerSessionMap" >  
+        <![CDATA[ 
+            SELECT * FROM t_customer_session WHERE token =  #{token}
+        ]]>   
+    </select>
+    
+</mapper>

@@ -1,0 +1,1 @@
+kill `ps -ef | grep CustomerServiceMain | grep -v grep | awk '{print $2}'`

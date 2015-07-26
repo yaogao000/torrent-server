@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.drink</groupId>
+		<artifactId>drink</artifactId>
+		<version>0.1</version>
+	</parent>
+	<artifactId>srv-parent</artifactId>
+	<packaging>pom</packaging>
+	<modules>
+		<module>srv-business</module>
+		<module>srv-cache</module>
+		<module>srv-customer</module>
+		<module>srv-map</module>
+		<module>srv-order</module>
+		<module>srv-pay</module>
+		<module>srv-risk</module>
+		<module>srv-sms</module>
+		<module>srv-system</module>
+		<module>srv-timer</module>
+    </modules>
+	<dependencies>
+		
+	</dependencies>
+</project>
