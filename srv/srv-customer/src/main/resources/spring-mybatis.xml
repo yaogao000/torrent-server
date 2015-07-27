@@ -24,10 +24,10 @@
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
 		destroy-method="close">
 		<!-- Connection Info -->
-		<property name="driverClassName" value="${jdbc.driver}" />
-		<property name="url" value="${jdbc.url}" />
-		<property name="username" value="${jdbc.username}" />
-		<property name="password" value="${jdbc.password}" />
+		<property name="driverClassName" value="${jdbc.main.driver}" />
+		<property name="url" value="${jdbc.main.url}" />
+		<property name="username" value="${jdbc.main.username}" />
+		<property name="password" value="${jdbc.main.password}" />
 
 		<!-- Connection Pooling DBCP -->
 		<property name="validationQuery" value="SELECT 1" />

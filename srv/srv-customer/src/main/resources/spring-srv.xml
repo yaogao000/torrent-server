@@ -18,6 +18,8 @@
 	
 	<import resource="spring-mybatis.xml" />
 	
+	<import resource="spring-redis.xml" />
+	
 	<!-- client -->
 	<import resource="spring-srv-client.xml" />
 
