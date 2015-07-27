@@ -21,34 +21,33 @@ import com.drink.srv.CustomerSrv;
 import com.drink.srv.info.CustomerSession;
 import com.drink.srv.support.SrvException;
 
+/**
+ * 
+ * @author yaogaolin
+ *
+ */
 @Controller
 @RequestMapping(value = "/customer")
 public class CustomerController extends BaseController {
-	private final static Logger logger = LoggerFactory
-			.getLogger(CustomerController.class);
+	private final static Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
 	@Autowired
 	private CustomerSrv.Iface customerSrv;
 
 	@RequestMapping(value = "login", produces = "application/json")
 	@ResponseBody
-	public ResponseMessssage login(
-			@RequestParam(value = Constants.CONS_PHONE) String phone,
-			@RequestParam(value = Constants.CONS_PASSWORD, required = false) String password,
-			@RequestParam(value = Constants.CONS_CAPTCHA) String captcha,
-			@RequestParam(value = Constants.CONS_AESKEY) String __aeskey,
+	public ResponseMessssage login(@RequestParam(value = Constants.CONS_PHONE) String phone, @RequestParam(value = Constants.CONS_PASSWORD, required = false) String password,
+			@RequestParam(value = Constants.CONS_CAPTCHA) String captcha, @RequestParam(value = Constants.CONS_AESKEY) String __aeskey,
 			@RequestParam(value = Constants.CONS_CITY_ID, required = false, defaultValue = "0") int cityID,
 			@RequestParam(value = Constants.CONS_COUNTRY_CODE, required = false, defaultValue = "86") short countryCode,
-			@RequestParam(value = Constants.CONS_LAT, required = false, defaultValue = "0") double lat,
-			@RequestParam(value = Constants.CONS_LNG, required = false, defaultValue = "0") double lng,
+			@RequestParam(value = Constants.CONS_LAT, required = false, defaultValue = "0") double lat, @RequestParam(value = Constants.CONS_LNG, required = false, defaultValue = "0") double lng,
 			HttpServletRequest request) throws SrvException, TException {
 		// TODO 验证 手机号码
-		
+
 		// 验证 aes 是否 被 有效的 rsa public key 加密
 		String aeskey = null;
 		try {
-			aeskey = new String(RSAUtils.decryptByPrivateKey(
-					__aeskey.getBytes(), getRSAPrivateKey()));
+			aeskey = new String(RSAUtils.decryptByPrivateKey(__aeskey.getBytes(), getRSAPrivateKey()));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return ResponseMessssage.INVALID_AESKEY;
@@ -67,8 +66,7 @@ public class CustomerController extends BaseController {
 		Map<String, Object> result = new HashMap<>();
 		result.put(Constants.CONS_TOKEN, session.getToken());
 		try {
-			result.put(Constants.CONS_SECRET, AESUtils.encrypt(
-					session.getSecret(), aeskey));
+			result.put(Constants.CONS_SECRET, AESUtils.encrypt(session.getSecret(), aeskey));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return ResponseMessssage.INVALID_AESKEY;

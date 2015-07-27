@@ -1,6 +1,20 @@
 package com.drink.cache;
 
-public interface CacheCallback {
+public abstract class CacheCallback {
+	/**
+	 * load data from container
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public abstract Object load(String key);
 
-	public Object load();
+	/**
+	 * mark the loaded object should be cached or not
+	 * 
+	 * @return
+	 */
+	public boolean needBeCached() {
+		return true;
+	}
 }

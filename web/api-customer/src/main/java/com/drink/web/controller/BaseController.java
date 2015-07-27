@@ -23,7 +23,7 @@ public class BaseController {
 		public final static String CONS_COUNTRY_CODE = "countryCode";
 		public final static String CONS_LAT = "lat";
 		public final static String CONS_LNG = "lng";
-		
+
 		public final static String CONS_TOKEN = AbstractFirstFilter.ACCESS_KEY_TOKEN;
 		public final static String CONS_SECRET = AbstractFirstFilter.ACCESS_SECRET;
 	}

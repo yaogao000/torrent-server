@@ -10,6 +10,14 @@ public interface ICache {
 	 * @param value
 	 */
 	void put(String key, Object value) throws CacheException;
+	
+	/**
+	 * put multiple key value pair to cache
+	 * 
+	 * @param key
+	 * @param value
+	 */
+	void put(String[] keys, Object value) throws CacheException;
 
 	/**
 	 * put a key value pair to cache
@@ -20,6 +28,16 @@ public interface ICache {
 	 * @param unit
 	 */
 	void put(String key, Object value, long timeout, TimeUnit unit) throws CacheException;
+	
+	/**
+	 * put multiple key value pair to cache
+	 * 
+	 * @param key
+	 * @param value
+	 * @param timeout
+	 * @param unit
+	 */
+	void put(String[] keys, Object value, long timeout, TimeUnit unit) throws CacheException;
 
 	/**
 	 * get value by key

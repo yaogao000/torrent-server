@@ -23,13 +23,15 @@ public class RedisCache implements ICache {
 
 	private String buildKey(String key) {
 		if (StringUtils.isBlank(cacheKeyPrefix)) {
-			throw new NullPointerException("please setting the cacheKeyPrefix parameter");
+			throw new NullPointerException(
+					"please setting the cacheKeyPrefix parameter");
 		}
 		return cacheKeyPrefix + key;
 	}
 
 	@Override
-	public void put(String key, Object value, long timeout, TimeUnit unit) throws CacheException {
+	public void put(String key, Object value, long timeout, TimeUnit unit)
+			throws CacheException {
 		try {
 			String json = JSONUtils.readObject2String(value);
 			valueOps.set(buildKey(key), json, timeout, unit);
@@ -54,7 +56,8 @@ public class RedisCache implements ICache {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T get(String key, Class<T> type, CacheCallback callback) throws CacheException {
+	public <T> T get(String key, Class<T> type, CacheCallback callback)
+			throws CacheException {
 		String json = valueOps.get(buildKey(key));
 		if (StringUtils.isNotBlank(json)) {
 			try {
@@ -63,7 +66,14 @@ public class RedisCache implements ICache {
 				throw new CacheException(e);
 			}
 		} else {
-			return (T) callback.load();
+			T result = (T) callback.load(key);
+			
+			if(null != result && callback.needBeCached()){
+				// 加入 缓存
+				this.put(key, result);
+			}
+			
+			return result;
 		}
 	}
 
@@ -82,6 +92,32 @@ public class RedisCache implements ICache {
 
 	public void setCacheKeyPrefix(String cacheKeyPrefix) {
 		this.cacheKeyPrefix = cacheKeyPrefix;
+	}
+
+	@Override
+	public void put(String[] keys, Object value) throws CacheException {
+		try {
+			String json = JSONUtils.readObject2String(value);
+			for (String key : keys) {
+				valueOps.set(buildKey(key), json);
+			}
+		} catch (Exception e) {
+			throw new CacheException(e);
+		}
+	}
+
+	@Override
+	public void put(String[] keys, Object value, long timeout, TimeUnit unit)
+			throws CacheException {
+		try {
+			String json = JSONUtils.readObject2String(value);
+			for (String key : keys) {
+				valueOps.set(buildKey(key), json, timeout, unit);
+			}
+		} catch (Exception e) {
+			throw new CacheException(e);
+		}
+
 	}
 
 }

@@ -22,23 +22,6 @@
 		<property name="testOnBorrow" value="${redis.testOnBorrow}" />
 	</bean>
 
-	<bean id="redisGlobalLockConnectionFactory"
-		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-		<property name="usePool" value="true"></property>
-		<property name="hostName" value="${redis.globalLock.host}" />
-		<property name="port" value="${redis.globalLock.port}" />
-		<property name="password" value="${redis.globalLock.pass}" />
-		<property name="timeout" value="${redis.timeout}" />
-		<property name="database" value="${redis.default.db}" />
-		<constructor-arg index="0" ref="jedisPoolConfig" />
-	</bean>
-
-	<bean id="redisGlobalLockTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
-		p:connection-factory-ref="redisGlobalLockConnectionFactory" />
-
-	<bean id="globalLockRedisFactory" class="com.drink.lock.GlobalLockRedisFactory">
-		<property name="globalLockRedisTemplate" ref="redisGlobalLockTemplate" />
-	</bean>
 
 	<bean id="customerConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
@@ -54,26 +37,9 @@
 	<bean id="customerRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
 		p:connection-factory-ref="customerConnectionFactory" />
 	
-	<bean id="customerListenerContainer"
-		class="org.springframework.data.redis.listener.RedisMessageListenerContainer"
-		p:connection-factory-ref="customerConnectionFactory" />
-	
-	<bean id="customerJedisService" class="com.drink.redis.JedisService">
-		<property name="redisTemplate" ref="customerRedisTemplate"/>
-		<property name="valueOps" ref="customerRedisTemplate"/>
-		<property name="listOps" ref="customerRedisTemplate"/>
-		<property name="setOps" ref="customerRedisTemplate"/>
-		<property name="zSetOps" ref="customerRedisTemplate"/>
-		<property name="opsForHash" ref="customerRedisTemplate"/>
-		<property name="listenerContainer" ref="customerListenerContainer"/>
-	</bean>
 	
 	<bean id="customerRedisCache" class="com.drink.cache.RedisCache">
 		<property name="valueOps" ref="customerRedisTemplate"/>
 		<property name="cacheKeyPrefix" ref="${redis.key.prefix.customer}"/>
-	</bean>
-	<bean id="customerSessionRedisCache" class="com.drink.cache.RedisCache">
-		<property name="valueOps" ref="customerRedisTemplate"/>
-		<property name="cacheKeyPrefix" ref="${redis.key.prefix.customerSession}"/>
 	</bean>
 </beans>
