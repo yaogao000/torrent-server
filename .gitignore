@@ -17,7 +17,7 @@ out/
 *.log
 
 #thrift out java
-lib/lib-thrift/src/main/java
+lib/lib-thrift/src/main/java/com/drink
 
 .DS_Store
 **/.DS_Store
