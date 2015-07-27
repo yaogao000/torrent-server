@@ -20,27 +20,44 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 
 	@Override
 	public CustomerSession login(String phone, String password, short countryCode, CustomerSession session) throws SrvException, TException {
-		Customer customer = customerService.getCustomerByPhone(phone);
-		if (null == customer) {
+		long cid = customerService.getCustomerIdByPhone(phone);
+		if (cid <= 0) {
 			// save customer
-			customer = new Customer();
+			Customer customer = new Customer();
 			customer.setCountryCode(countryCode);
 			customer.setCityId(session.getCityId());
 			customer.setMobile(phone);
 
 			// 保存 customer, 并存入 redis 中，
 			customerService.save(customer);
+			cid= customer.getCid();// 取出cid
 		}
-
-		session.setCid(customer.getCid());// 设置用户 cid
 
 		RandomToken token = RandomToken.build();
 		session.setToken(token.getToken());
 		session.setSecret(token.getSecret());
 		session.setExpireAt(System.currentTimeMillis() + KEY_TIME_OUT_CUSTOMER_SESSION);
-
-		// 保存 session 并存入 redis 中
-		customerService.save(session);
+		
+		CustomerSession local = customerService.getSessionByCid(cid);
+		if(local == null){
+			session.setCid(cid);// 设置用户 cid
+			// 保存 session 并存入 redis 中
+			customerService.saveOrUpdate(session, true);
+		}else{
+			if(local.getCityId() != session.getCityId()){
+				//TODO 推送消息给用户，安全问题， 或者 系统 根据 城市id 变动，进行不同的推销活动
+			}
+			local.setToken(session.getToken());
+			local.setSecret(session.getSecret());
+			local.setExpireAt(session.getExpireAt());
+			local.setAeskey(session.getAeskey());
+			local.setClient(session.getClient());
+			local.setCityId(session.getCityId());
+			local.setLat(session.getLat());
+			local.setLng(session.getLng());
+			customerService.saveOrUpdate(local, false);
+		}
+		
 
 		return session;
 	}
