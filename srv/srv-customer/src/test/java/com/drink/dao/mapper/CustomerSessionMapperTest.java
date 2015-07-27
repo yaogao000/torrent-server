@@ -8,7 +8,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.drink.dao.mapper.entity.CustomerSession;
+import com.drink.srv.info.CustomerSession;
+
 
 
 @RunWith(SpringJUnit4ClassRunner.class)

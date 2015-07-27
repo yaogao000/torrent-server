@@ -1,6 +1,7 @@
 package com.drink.dao.mapper;
 
-import com.drink.dao.mapper.entity.CustomerSession;
+import com.drink.srv.info.CustomerSession;
+
 
 
 public interface CustomerSessionMapper {

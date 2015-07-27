@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import com.drink.common.RandomToken;
 import com.drink.dao.mapper.CustomerMapper;
 import com.drink.dao.mapper.CustomerSessionMapper;
-import com.drink.dao.mapper.entity.Customer;
-import com.drink.dao.mapper.entity.CustomerSession;
 import com.drink.srv.CustomerSrv;
+import com.drink.srv.info.Customer;
+import com.drink.srv.info.CustomerSession;
 import com.drink.srv.support.SrvException;
 
 @Service("customerService")
@@ -22,23 +22,21 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 	private CustomerSessionMapper customerSessionMapper;
 
 	@Override
-	public Map<String, String> login(String phone,
-			Map<String, String> customerSession) throws SrvException,
+	public CustomerSession login(String phone, String password, short countryCode,
+			CustomerSession session) throws SrvException,
 			TException {
 		Customer customer = customerMapper.getCustomerByPhone(phone);
 		if (null == customer) {
 			// save customer
 			customer = new Customer();
-			customer.setCountryId(Short.valueOf(customerSession
-					.get("countryId")));
-			customer.setCityId(Integer.valueOf(customerSession.get("cityId")));
+			customer.setCountryCode(countryCode);
+			customer.setCityId(session.getCityId());
 			customer.setMobile(phone);
 
 			// 保存 customer, 并存入 redis 中，
 			customerMapper.insert(customer);
 		}
 
-		CustomerSession session = new CustomerSession();
 		session.setCid(customer.getCid());
 
 		RandomToken token = RandomToken.build();

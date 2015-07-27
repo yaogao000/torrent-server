@@ -10,6 +10,7 @@ import org.apache.thrift.transport.TTransport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.drink.srv.info.CustomerSession;
 import com.drink.srv.main.Bootstrap;
 
 public class CustomerClientMain extends Bootstrap {
@@ -25,15 +26,15 @@ public class CustomerClientMain extends Bootstrap {
 	}
 
 	private static void testLoginByRemote() {
-		Map<String, String> session = new HashMap<String,String>(4);
-		session.put("aeskey", "aeskey");
+		CustomerSession session = new CustomerSession();
+		session.setCityId(1);
 
 		try {
 			TTransport transport = new TSocket("localhost", 9020);
 			TProtocol protocol = new TBinaryProtocol(transport);
 			CustomerSrv.Client client = new CustomerSrv.Client(protocol);
 			transport.open();
-			System.out.println(client.login("13621700250", session));
+			System.out.println(client.login("13621700250",null, (short)86, session));
 			transport.close();
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
@@ -41,13 +42,13 @@ public class CustomerClientMain extends Bootstrap {
 	}
 
 	public static void testLOginByDirect() {
-		Map<String, String> session = new HashMap<String,String>(4);
-		session.put("aeskey", "aeskey");
+		CustomerSession session = new CustomerSession();
+		session.setCityId(1);
 
 		try {
 			CustomerSrv.Client client = context.getBean("customerService",
 					CustomerSrv.Client.class);
-			System.out.println(client.login("13621700250", session));
+			System.out.println(client.login("13621700250",null, (short)86, session));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 		} finally {

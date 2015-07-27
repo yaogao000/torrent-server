@@ -18,6 +18,7 @@ import com.drink.common.security.AESUtils;
 import com.drink.common.security.RSAUtils;
 import com.drink.common.web.ResponseMessssage;
 import com.drink.srv.CustomerSrv;
+import com.drink.srv.info.CustomerSession;
 import com.drink.srv.support.SrvException;
 
 @Controller
@@ -37,7 +38,7 @@ public class CustomerController extends BaseController {
 			@RequestParam(value = Constants.CONS_CAPTCHA) String captcha,
 			@RequestParam(value = Constants.CONS_AESKEY) String __aeskey,
 			@RequestParam(value = Constants.CONS_CITY_ID, required = false, defaultValue = "0") int cityID,
-			@RequestParam(value = Constants.CONS_COUNTRY_CODE, required = false, defaultValue = "86") int countryCode,
+			@RequestParam(value = Constants.CONS_COUNTRY_CODE, required = false, defaultValue = "86") short countryCode,
 			@RequestParam(value = Constants.CONS_LAT, required = false, defaultValue = "0") double lat,
 			@RequestParam(value = Constants.CONS_LNG, required = false, defaultValue = "0") double lng,
 			HttpServletRequest request) throws SrvException, TException {
@@ -55,21 +56,19 @@ public class CustomerController extends BaseController {
 
 		// TDODO 验证 captcha -- redis 缓存
 
-		Map<String, String> session = new HashMap<>(8);
-		session.put(Constants.CONS_AESKEY, aeskey);
-		session.put(Constants.CONS_PASSWORD, password);
-		session.put(Constants.CONS_CITY_ID, String.valueOf(cityID));
-		session.put(Constants.CONS_COUNTRY_CODE, String.valueOf(countryCode));
-		session.put(Constants.CONS_LAT, String.valueOf(lat));
-		session.put(Constants.CONS_LNG, String.valueOf(lng));
+		CustomerSession session = new CustomerSession();
+		session.setAeskey(aeskey);
+		session.setCityId(cityID);
+		session.setLat(lat);
+		session.setLng(lng);
 
-		Map<String, String> loginResult = customerSrv.login(phone, session);
+		session = customerSrv.login(phone, password, countryCode, session);
 
 		Map<String, Object> result = new HashMap<>();
-		result.put(Constants.CONS_TOKEN, loginResult.get(Constants.CONS_TOKEN));
+		result.put(Constants.CONS_TOKEN, session.getToken());
 		try {
 			result.put(Constants.CONS_SECRET, AESUtils.encrypt(
-					loginResult.get(Constants.CONS_SECRET), aeskey));
+					session.getSecret(), aeskey));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			return ResponseMessssage.INVALID_AESKEY;

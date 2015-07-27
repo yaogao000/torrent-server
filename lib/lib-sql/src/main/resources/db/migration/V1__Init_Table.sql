@@ -8,8 +8,8 @@ CREATE TABLE `t_customer` (
   `photo` varchar(120) NOT NULL DEFAULT '',
   `country_id` smallint(5) unsigned NOT NULL DEFAULT '1' COMMENT '国家ID',
   `city_id` int(20) unsigned NOT NULL DEFAULT '0',
-  `ct_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `up_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`cid`),
   UNIQUE KEY `Index_phone` (`mobile`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='乘客信息表';
@@ -23,8 +23,8 @@ CREATE TABLE `t_customer_session` (
   `lat` double DEFAULT NULL COMMENT '纬度 ',
   `lng` double DEFAULT NULL COMMENT '经度 ',
   `expire_at` int(10) unsigned NOT NULL COMMENT 'token 失效 时间点',
-  `ct_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `up_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`cid`),
   UNIQUE KEY `AK_Key_token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='乘客的登陆session 流水表\n';
