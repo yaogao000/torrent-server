@@ -1,8 +1,5 @@
 package com.drink.srv;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -41,13 +38,12 @@ public class CustomerClientMain extends Bootstrap {
 		}
 	}
 
-	public static void testLOginByDirect() {
+	public static void testLoginByDirect() {
 		CustomerSession session = new CustomerSession();
 		session.setCityId(1);
 
 		try {
-			CustomerSrv.Client client = context.getBean("customerService",
-					CustomerSrv.Client.class);
+			CustomerSrv.Client client = context.getBean(CustomerSrv.Client.class);
 			System.out.println(client.login("13621700250",null, (short)86, session));
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);

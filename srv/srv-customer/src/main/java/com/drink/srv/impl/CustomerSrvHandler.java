@@ -1,7 +1,5 @@
 package com.drink.srv.impl;
 
-import java.util.Map;
-
 import org.apache.thrift.TException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,23 +7,22 @@ import org.springframework.stereotype.Service;
 import com.drink.common.RandomToken;
 import com.drink.dao.mapper.CustomerMapper;
 import com.drink.dao.mapper.CustomerSessionMapper;
+import com.drink.service.CustomerService;
 import com.drink.srv.CustomerSrv;
 import com.drink.srv.info.Customer;
 import com.drink.srv.info.CustomerSession;
 import com.drink.srv.support.SrvException;
 
-@Service("customerService")
+@Service("remoteCustomerSrv")
 public class CustomerSrvHandler implements CustomerSrv.Iface {
 	@Autowired
-	private CustomerMapper customerMapper;
-	@Autowired
-	private CustomerSessionMapper customerSessionMapper;
+	private CustomerService customerService;
 
 	@Override
 	public CustomerSession login(String phone, String password, short countryCode,
 			CustomerSession session) throws SrvException,
 			TException {
-		Customer customer = customerMapper.getCustomerByPhone(phone);
+		Customer customer = customerService.getCustomerByPhone(phone);
 		if (null == customer) {
 			// save customer
 			customer = new Customer();
@@ -34,7 +31,7 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 			customer.setMobile(phone);
 
 			// 保存 customer, 并存入 redis 中，
-			customerMapper.insert(customer);
+			customerService.insert(customer);
 		}
 
 		session.setCid(customer.getCid());
@@ -45,9 +42,9 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 		session.setExpireAt(generateExpireAt());
 		
 		// 保存 session 并存入 redis 中
-		customerSessionMapper.insert(session);
+		customerService.insert(session);
 
-		return null;
+		return session;
 	}
 
 	private long generateExpireAt() {
