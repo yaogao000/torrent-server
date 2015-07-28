@@ -44,7 +44,7 @@ public class CustomerController extends BaseController {
 			@RequestParam(value = Constants.CONS_LAT, required = false, defaultValue = "0") double lat, @RequestParam(value = Constants.CONS_LNG, required = false, defaultValue = "0") double lng,
 			HttpServletRequest request) throws SrvException, TException {
 		// 验证 手机号码
-		if(!RegixUtis.isMobileNO(phone)){
+		if (!RegixUtis.isMobileNO(phone)) {
 			return ResponseMessssage.ERROR(ResponseMessssage.buildIllegalMessage(Constants.CONS_PHONE, phone));
 		}
 		// 验证 aes 是否 被 有效的 rsa public key 加密
@@ -57,7 +57,7 @@ public class CustomerController extends BaseController {
 		}
 
 		// 验证 captcha
-		if(!customerSrv.checkCaptcha(phone, captcha, countryCode)){
+		if (!customerSrv.checkCaptcha(phone, captcha, countryCode)) {
 			return ResponseMessssage.ERROR(ResponseMessssage.buildIllegalMessage(Constants.CONS_CAPTCHA, captcha));
 		}
 
@@ -77,17 +77,17 @@ public class CustomerController extends BaseController {
 			logger.error(e.getMessage(), e);
 			return ResponseMessssage.INVALID_AESKEY;
 		}
-		
+
 		return ResponseMessssage.OK(result);
 	}
-	
+
 	/**
 	 * 获取验证码
 	 * 
 	 * @param type
 	 *            1-乘客一键登陆验证码;2-修改手机号验证码
-	 * @throws TException 
-	 * @throws SrvException 
+	 * @throws TException
+	 * @throws SrvException
 	 * 
 	 * */
 	@RequestMapping(value = "captcha.do", produces = "application/json")
@@ -102,6 +102,22 @@ public class CustomerController extends BaseController {
 
 		// 生成验证码
 		customerSrv.generateCaptcha(phone, type, countryCode);
+
+		return ResponseMessssage.OK();
+	}
+
+	@RequestMapping(value = "signout.do", produces = "application/json")
+	@ResponseBody
+	public ResponseMessssage signout(@RequestParam(value = Constants.CONS_PHONE, required = true) String phone,
+			@RequestParam(value = Constants.CONS_COUNTRY_CODE, required = false, defaultValue = "86") short countryCode, @RequestParam(value = Constants.CONS_TOKEN, required = true) String token,
+			HttpServletRequest request) throws SrvException, TException {
+		// 验证 手机号码
+		if (!RegixUtis.isMobileNO(phone)) {
+			return ResponseMessssage.ERROR(ResponseMessssage.buildIllegalMessage(Constants.CONS_PHONE, phone));
+		}
+
+		// 注销登录
+//		customerSrv.signout(phone, countryCode, token);
 
 		return ResponseMessssage.OK();
 	}
