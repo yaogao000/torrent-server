@@ -9,7 +9,7 @@ read env
 echo -e "\n选择的环境为：$env"
 
 if [ $env == "dev" ]||[ $env == "alpha" ]||[ $env == "prd" ]||[ $env == "test" ];then
-	mvn clean package -DportableConfig="src/main/portable/$env.xml"
+	mvn clean package -Dmaven.test.skip=true -Denv=$env -e
 else
 	echo -e "\a\nplease setting the correct env parameter"
 fi

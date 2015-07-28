@@ -35,7 +35,7 @@ public class CustomerController extends BaseController {
 	@Autowired
 	private CustomerSrv.Iface customerSrv;
 
-	@RequestMapping(value = "login", produces = "application/json")
+	@RequestMapping(value = "login.do", produces = "application/json")
 	@ResponseBody
 	public ResponseMessssage login(@RequestParam(value = Constants.CONS_PHONE) String phone, @RequestParam(value = Constants.CONS_PASSWORD, required = false) String password,
 			@RequestParam(value = Constants.CONS_CAPTCHA) String captcha, @RequestParam(value = Constants.CONS_AESKEY) String __aeskey,
@@ -44,7 +44,7 @@ public class CustomerController extends BaseController {
 			@RequestParam(value = Constants.CONS_LAT, required = false, defaultValue = "0") double lat, @RequestParam(value = Constants.CONS_LNG, required = false, defaultValue = "0") double lng,
 			HttpServletRequest request) throws SrvException, TException {
 		// 验证 手机号码
-		if(!RegixUtis.isTelNO(phone)){
+		if(!RegixUtis.isMobileNO(phone)){
 			return ResponseMessssage.ERROR(ResponseMessssage.buildIllegalMessage(Constants.CONS_PHONE, phone));
 		}
 		// 验证 aes 是否 被 有效的 rsa public key 加密
@@ -90,13 +90,13 @@ public class CustomerController extends BaseController {
 	 * @throws SrvException 
 	 * 
 	 * */
-	@RequestMapping(value = "captcha", produces = "application/json")
+	@RequestMapping(value = "captcha.do", produces = "application/json")
 	@ResponseBody
 	public ResponseMessssage getCaptcha(@RequestParam(value = Constants.CONS_PHONE, required = true) String phone,
 			@RequestParam(value = Constants.CONS_COUNTRY_CODE, required = false, defaultValue = "86") short countryCode,
 			@RequestParam(value = Constants.CONS_SMS_TYPE, required = false, defaultValue = "1") short type, HttpServletRequest request) throws SrvException, TException {
 		// 验证 手机号码
-		if (!RegixUtis.isTelNO(phone)) {
+		if (!RegixUtis.isMobileNO(phone)) {
 			return ResponseMessssage.ERROR(ResponseMessssage.buildIllegalMessage(Constants.CONS_PHONE, phone));
 		}
 

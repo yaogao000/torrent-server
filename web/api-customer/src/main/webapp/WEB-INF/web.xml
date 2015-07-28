@@ -18,7 +18,7 @@
 		</init-param>
 		<init-param>
 			<param-name>nocheck</param-name>
-			<param-value>login,signIn</param-value>
+			<param-value>login,captcha</param-value>
 		</init-param>
 		<init-param>
 			<param-name>targetFilterLifecycle</param-name>
@@ -48,7 +48,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>spring</servlet-name>
-		<url-pattern>/</url-pattern>
+		<url-pattern>*.do</url-pattern>
 	</servlet-mapping>
 	
 	<filter>

@@ -36,13 +36,11 @@
     </bean>
     -->
     <!-- fixedAddress -->
-   <!-- 
     <bean id="customerSrv" class="com.drink.srv.support.SrvServiceClientProxyFactory">
         <property name="service" value="com.drink.srv.CustomerSrv"></property>
         <property name="serverAddress" value="127.0.0.1:9020:2"></property>
         <property name="maxActive" value="${srv.client.maxActive}"></property>
         <property name="idleTime" value="${srv.client.idleTime}"></property>
     </bean>
-     -->
     
 </beans>

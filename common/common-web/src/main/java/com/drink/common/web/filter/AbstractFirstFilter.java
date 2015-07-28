@@ -151,6 +151,11 @@ public abstract class AbstractFirstFilter implements Filter {
 			return false;
 		}
 		String method = StringUtils.substringAfterLast(uri, "/");
+		
+		// 去除 .do 后缀
+		if(StringUtils.isNotBlank(method) && method.endsWith(".do")){
+			method = method.substring(0, method.lastIndexOf(".do"));
+		}
 		return !noChecks.contains(method);
 	}
 

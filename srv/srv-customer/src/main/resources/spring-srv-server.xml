@@ -24,11 +24,11 @@
 	</bean> 
 	-->
 
-	<!-- <bean id="customerService" class="com.drink.srv.CustomerSrvHandler"/> -->
+	<!-- <bean id="remoteCustomerSrv" class="com.drink.srv.CustomerSrvHandler"/> -->
 
 	<bean class="com.drink.srv.support.SrvServiceServerFactory"
 		destroy-method="close">
-		<property name="service" ref="customerService"></property>
+		<property name="service" ref="remoteCustomerSrv"></property>
 		<property name="port" value="${srv.port.customer}" />
 		<!-- 
 		<property name="addressRegister">

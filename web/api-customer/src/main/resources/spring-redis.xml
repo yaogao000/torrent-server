@@ -40,6 +40,6 @@
 	
 	<bean id="customerRedisCache" class="com.drink.cache.RedisCache">
 		<property name="valueOps" ref="customerRedisTemplate"/>
-		<property name="cacheKeyPrefix" ref="${redis.key.prefix.customer}"/>
+		<property name="cacheKeyPrefix" value="${redis.key.prefix.customer}"/>
 	</bean>
 </beans>

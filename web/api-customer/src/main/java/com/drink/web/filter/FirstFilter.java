@@ -25,7 +25,7 @@ public class FirstFilter extends AbstractFirstFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(FirstFilter.class);
 
-	@Qualifier("customerJedisService")
+	@Qualifier("customerRedisCache")
 	@Autowired
 	private RedisCache customerRedisCache;
 

@@ -165,7 +165,7 @@ public class CustomerService {
 			captchaCode = RandomStringUtils.randomNumeric(4);
 			customerRedisCache.put(key, captchaCode, KEY_TIME_OUT_CAPTCHA, TimeUnit.SECONDS);
 		}
-
+		logger.info("captchaCode: " + captchaCode);
 		// TODO 短信发送
 		// int msgType = (type == 1 ? 1: 2);
 		// smsSrv.sendSms(msgType, data);
