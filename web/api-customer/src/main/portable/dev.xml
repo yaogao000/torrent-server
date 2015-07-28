@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<portable-config>
+  <config-file path="WEB-INF/classes/config.properties">
+    <replace key="jdbc.main.username">root</replace>
+    <replace key="jdbc.main.password">abc123</replace>
+    <replace key="jdbc.main.url">jdbc:mysql://localhost:3306/drink?autoReconnect=true&amp;characterEncoding=UTF-8&amp;zeroDateTimeBehavior=convertToNull</replace>
+  </config-file>
+  <config-file path="WEB-INF/classes/applicationContext.xml">
+  </config-file>
+  <config-file path="WEB-INF/classes/log4j.properties">
+  </config-file>
+  <config-file path="WEB-INF/classes/spring-property.xml">
+  </config-file>
+  <config-file path="WEB-INF/classes/spring-redis.xml">
+  </config-file>
+  <config-file path="WEB-INF/classes/spring-servlet.xml">
+  </config-file>
+  <config-file path="WEB-INF/classes/spring-srv-client.xml">
+  </config-file>
+</portable-config>
