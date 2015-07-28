@@ -1,4 +1,4 @@
-package com.drink.web.filter.funnel;
+package com.drink.common.web.filter.funnel;
 
 /**
  * 
@@ -8,10 +8,10 @@ package com.drink.web.filter.funnel;
 public class RequestFunnel {
 	private String api;
 	private String key;
-	private short limit;
-	private short time;
+	private int limit;
+	private int time;
 	private String[] parameters;
-	private short code;
+	private int code;
 	private String msg;
 
 	public String getApi() {
@@ -30,19 +30,19 @@ public class RequestFunnel {
 		this.key = key;
 	}
 
-	public short getLimit() {
+	public int getLimit() {
 		return limit;
 	}
 
-	public void setLimit(short limit) {
+	public void setLimit(int limit) {
 		this.limit = limit;
 	}
 
-	public short getTime() {
+	public int getTime() {
 		return time;
 	}
 
-	public void setTime(short time) {
+	public void setTime(int time) {
 		this.time = time;
 	}
 
@@ -54,11 +54,11 @@ public class RequestFunnel {
 		this.parameters = parameters;
 	}
 
-	public short getCode() {
+	public int getCode() {
 		return code;
 	}
 
-	public void setCode(short code) {
+	public void setCode(int code) {
 		this.code = code;
 	}
 
