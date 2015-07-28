@@ -1,0 +1,12 @@
+[
+	{
+		"/customer/captcha":{
+			"key":"c_a_c",
+			"limit" : 10,
+			"time" : 1000,
+			"parameter":["phone"],
+			"code":500,
+			"msg":"请求太过频繁"
+		}
+	}
+]
