@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -23,11 +24,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import com.drink.cache.RedisCache;
 import com.drink.common.JSONUtils;
+import com.drink.common.web.ResponseMessssage;
+import com.drink.redis.JedisService;
 import com.drink.web.filter.funnel.RequestFunnel;
 
 /**
@@ -41,9 +44,11 @@ public class RequestFunnelFilter implements Filter {
 
 	private static final Logger logger = LoggerFactory.getLogger(RequestFunnelFilter.class);
 
-	// @Qualifier("requestFunnelRedisCache")
-	// @Autowired
-	private RedisCache requestFunnelRedisCache;
+	@Qualifier("funnelJedisService")
+	@Autowired
+	private JedisService requestFunnelJedisService;
+	@Value("redis.key.prefix.requestFunnel")
+	private String keyPrefix;
 
 	private Map<String, RequestFunnel> requestFunnels;
 
@@ -64,10 +69,33 @@ public class RequestFunnelFilter implements Filter {
 
 		HttpServletResponse response = (HttpServletResponse) resp;
 		response.setContentType("application/json;charset=UTF-8");
-		
+
 		RequestFunnel requestFunnel = requestFunnels.get(requestUri);
-		
-//		requestFunnelRedisCache.
+		String key = buildKey(requestFunnel, request);
+
+		if (!requestFunnelJedisService.hasReachedUpperlimitInSomeTime(key, requestFunnel.getLimit(), requestFunnel.getTime(), TimeUnit.MICROSECONDS)) {
+			filterChain.doFilter(req, resp);
+		} else {
+			String message = requestFunnel.getMsg();
+			if (StringUtils.isBlank(message)) {
+				message = ResponseMessssage.REQ_OVERFLOW_STR;
+			}
+			response.getWriter().println(message);
+		}
+	}
+
+	private String buildKey(RequestFunnel funnel, HttpServletRequest request) {
+		String[] paramers = funnel.getParameters();
+		Object[] values = new String[paramers.length];
+		for (int i = 0, length = paramers.length; i < length; i++) {
+			String value = request.getParameter(paramers[i]);
+			if (StringUtils.isBlank(value)) {// spring mvc 请求参数有默认值，如果值没有设置，则用 DEFAULT 代替，这样，只要是同一个请求，就会被处理
+				values[i] = "df";// default
+			} else {
+				values[i] = value;
+			}
+		}
+		return String.format(keyPrefix + funnel.getKey(), values);
 	}
 
 	@Override
@@ -117,6 +145,8 @@ public class RequestFunnelFilter implements Filter {
 			logger.warn("No settign funnels");
 			return;
 		}
+
+		// TODO 验证 requestFunnelList 各个字段的值是否符合格式
 
 		requestFunnels = new HashMap<>(requestFunnelList.size());
 		for (RequestFunnel requestFunnel : requestFunnelList) {

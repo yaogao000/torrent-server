@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.drink.common.web.IpUtils;
+import com.drink.common.web.ResponseMessssage;
 
 /**
  * 
@@ -108,7 +109,7 @@ public abstract class AbstractFirstFilter implements Filter {
 		} catch (Exception e) {
 			logger.error(e.getMessage(), e);
 			// 写死，临时方案
-			response.getWriter().println("{\"ret\":{\"code\":999,\"msg\":\"Filter Unkown Error!\"},\"data\":\"\",\"cookies\":\"\"}");
+			response.getWriter().println(ResponseMessssage.FILTER_UNKNOW_ERROR);
 		} finally {
 
 		}

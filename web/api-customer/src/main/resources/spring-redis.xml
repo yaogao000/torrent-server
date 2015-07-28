@@ -42,4 +42,23 @@
 		<property name="valueOps" ref="customerRedisTemplate"/>
 		<property name="cacheKeyPrefix" value="${redis.key.prefix.customer}"/>
 	</bean>
+	
+	<bean id="funnelConnectionFactory"
+		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="usePool" value="true"></property>
+		<property name="hostName" value="${redis.funnel.host}" />
+		<property name="port" value="${redis.funnel.port}" />
+		<property name="password" value="${redis.funnel.pass}" />
+		<property name="timeout" value="${redis.timeout}" />
+		<property name="database" value="${redis.default.db}" />
+		<constructor-arg index="0" ref="jedisPoolConfig" />
+	</bean>
+
+	<bean id="funnelRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
+		p:connection-factory-ref="funnelConnectionFactory" />
+		
+	<bean id="funnelJedisService" class="com.drink.redis.JedisService">
+		<property name="redisTemplate" ref="funnelRedisTemplate"/>
+		<property name="valueOps" ref="funnelRedisTemplate"/>
+	</bean>
 </beans>

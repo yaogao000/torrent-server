@@ -1,7 +1,7 @@
 [
 	{
 		"api":"/customer/captcha",
-		"key":"c_a_c",
+		"key":"c_a_c_%s",
 		"limit" : 10,
 		"time" : 1000,
 		"parameter":["phone"],

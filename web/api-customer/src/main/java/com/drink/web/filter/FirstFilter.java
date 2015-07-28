@@ -98,7 +98,7 @@ public class FirstFilter extends AbstractFirstFilter {
 	}
 
 	protected String getIdFlowOutrange() {
-		return ResponseMessssage.ID_REQ_OVERFLOW_STR;
+		return ResponseMessssage.REQ_OVERFLOW_STR;
 	}
 
 	protected String getIpFlowOutrange() {

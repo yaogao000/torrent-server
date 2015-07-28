@@ -41,7 +41,8 @@ public class ResponseMessssage {
 	public static final ResponseMessssage NULL_TOKEN = new ResponseMessssage(101,"Invalid token or appkey,is null!");
 	public static final ResponseMessssage INVALID_AESKEY = new ResponseMessssage(102,"Invalid __aeskey!");
 	public static final ResponseMessssage IP_REQ_OVERFLOW = new ResponseMessssage(998,"Request ip over flow");
-	public static final ResponseMessssage ID_REQ_OVERFLOW = new ResponseMessssage(998,"Request id over flow");
+	public static final ResponseMessssage REQ_OVERFLOW = new ResponseMessssage(998,"Request over flow");
+	public static final ResponseMessssage FILTER_UNKNOW_ERROR = new ResponseMessssage(999,"Filter Unkown Error");
 	
 	public static String NULL_SIG_STR;
 	public static String INVALID_SIG_STR;
@@ -49,7 +50,8 @@ public class ResponseMessssage {
 	public static String NULL_TOKEN_STR;
 	public static String INVALID_AESKEY_STR;
 	public static String IP_REQ_OVERFLOW_STR;
-	public static String ID_REQ_OVERFLOW_STR;
+	public static String REQ_OVERFLOW_STR;
+	public static String FILTER_UNKNOW_ERROR_STR;
 	static{
 		try {
 			NULL_SIG_STR = JSONUtils.readObject2String(NULL_SIG);
@@ -58,7 +60,8 @@ public class ResponseMessssage {
 			NULL_TOKEN_STR = JSONUtils.readObject2String(NULL_TOKEN);
 			INVALID_AESKEY_STR = JSONUtils.readObject2String(INVALID_SIG);
 			IP_REQ_OVERFLOW_STR = JSONUtils.readObject2String(IP_REQ_OVERFLOW);
-			ID_REQ_OVERFLOW_STR = JSONUtils.readObject2String(ID_REQ_OVERFLOW);
+			REQ_OVERFLOW_STR = JSONUtils.readObject2String(REQ_OVERFLOW);
+			FILTER_UNKNOW_ERROR_STR = JSONUtils.readObject2String(FILTER_UNKNOW_ERROR);
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 		}
