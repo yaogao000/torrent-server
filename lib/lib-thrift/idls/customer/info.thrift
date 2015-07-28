@@ -20,4 +20,5 @@ struct CustomerSession {
      7: double lat;
      8: double lng;
      9: i64 expireAt;
+     10: byte status;
 }

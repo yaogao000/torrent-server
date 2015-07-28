@@ -23,6 +23,7 @@ CREATE TABLE `t_customer_session` (
   `lat` double DEFAULT NULL COMMENT '纬度 ',
   `lng` double DEFAULT NULL COMMENT '经度 ',
   `expire_at` int(10) unsigned NOT NULL COMMENT 'token 失效 时间点',
+  `status` tinyint(3) unsigned DEFAULT '1' COMMENT 'token 是否有效: 0-失效; 1-有效;',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`cid`),

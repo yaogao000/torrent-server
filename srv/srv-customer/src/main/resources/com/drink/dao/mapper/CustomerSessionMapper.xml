@@ -10,38 +10,38 @@
 		<result property="client" column="client" />
 		<result property="lat" column="lat" />
 		<result property="lng" column="lng" />
-		<result property="expire_at" column="expireAt" />
+		<result property="expireAt" column="expire_at" />
 	</resultMap>
 
 	<select id="getSessionByToken" parameterType="String"
 		resultMap="customerSessionMap">  
         <![CDATA[ 
-            select cid,token,secret,client,lat,lng,expire_at from t_customer_session where token =  #{token} and expire_at < now()
+            select cid,token,secret,client,lat,lng from t_customer_session where token = #{token} and status = 1
         ]]>
 	</select>
 
 	<select id="getSessionByCid" parameterType="Long" resultMap="customerSessionMap">  
         <![CDATA[ 
-            select cid,token,secret,client,lat,lng,expire_at from t_customer_session where cid =  #{cid}
+            select cid,token,secret,client,lat,lng from t_customer_session where cid =  #{cid}
         ]]>
 	</select>
 
 	<select id="getSecretByToken" parameterType="String" resultMap="String">  
         <![CDATA[ 
-            select secret from t_customer_session where token =  #{token} and expire_at < now()
+            select secret from t_customer_session where token =  #{token} and status = 1
         ]]>
 	</select>
 
 	<insert id="insert" parameterType="com.drink.srv.info.CustomerSession">
 		insert into
-		t_customer_session(cid, token, secret, client, lat, lng, expire_at)
+		t_customer_session(cid, token, secret, client, lat, lng, expire_at, status)
 		values(#{cid}, #{token}, #{secret}, #{client}, #{lat}, #{lng},
-		#{expireAt})
+		#{expireAt}, #{status})
 	</insert>
 
 	<update id="update" parameterType="com.drink.srv.info.CustomerSession">
 		update t_customer_session set
-		token=#{token},secret=#{secret},client=#{client},lat=#{lat},lng=#{lng},expire_at=#{expireAt}
+		token=#{token},secret=#{secret},client=#{client},lat=#{lat},lng=#{lng},expire_at=#{expireAt}, status=#{status}
 		where cid = #{cid}
 	</update>
 

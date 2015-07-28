@@ -1,0 +1,72 @@
+[33mcommit 9d553fccfe7f63bce7caafde16aa4b8a90b7bef2[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Tue Jul 28 00:52:42 2015 +0800
+
+    用户session信息dao部分实现
+
+[33mcommit 9f03360778d6d15e8788562fcf913ae09424382b[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Mon Jul 27 22:46:00 2015 +0800
+
+    登陆流程实现
+
+[33mcommit 92a89201fcb206f64c9bd08de9dc5ed413da4f59[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Mon Jul 27 19:50:41 2015 +0800
+
+    抽象 redis 操作
+
+[33mcommit c9da3bc93d06c859fd283ce9b576b4a641c10545[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Mon Jul 27 18:42:29 2015 +0800
+
+    1. redis 加入 2. Global Lock 实现
+
+[33mcommit e1684a771f36ddf6859dce6a3582c72882540df2[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Mon Jul 27 16:27:55 2015 +0800
+
+    恢复依赖thrift定义的struct
+
+[33mcommit d1343ea22d81262e97f114bedfe66ab30495294c[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Mon Jul 27 10:12:08 2015 +0800
+
+    补录 lib-thrift下的src/main/java 目录
+
+[33mcommit 2b578d93fb50c4f20edf0b471d93602ddeaabadf[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Sun Jul 26 23:38:51 2015 +0800
+
+    1. 登陆部分实现 2. 规定 thrift 不定义 struct model类，减少 应用程序对 thrift 的依赖
+
+[33mcommit 98ff3554ead9c752b755536265f381ec0d9481a6[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Sun Jul 26 18:56:58 2015 +0800
+
+    补全为上传的空文件夹
+
+[33mcommit eabc80b4a8882bc5b4cf3e98b1c3fbc502f1e36b[m
+Merge: fb4ddb0 53a0de7
+Author: yaogao000 <yaogao000@163.com>
+Date:   Sun Jul 26 18:23:00 2015 +0800
+
+    Merge branch 'master' of git.coding.net:yaogao000/drink-happy
+
+[33mcommit 53a0de72d0ff9c120ddc6de75261d2d0d430ed56[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Sun Jul 26 18:20:27 2015 +0800
+
+    delete
+
+[33mcommit fb4ddb0ca56a3179b78a5181988e79839c7a558c[m
+Author: yaogao000 <yaogao000@163.com>
+Date:   Sun Jul 26 18:18:38 2015 +0800
+
+    init version
+
+[33mcommit 6fa1fd9c4221eaf4d8cce91a578af97a6fd2b9f7[m
+Author: yaogao000 <344246652@qq.com>
+Date:   Tue Jul 21 19:59:19 2015 +0800
+
+    Initial commit

@@ -24,7 +24,7 @@ import com.drink.srv.info.CustomerSession;
  */
 public interface CustomerSessionMapper {
 	/**
-	 * 根据用户 token 获取 session 信息， 会检查 session 是否 失效， 如果已经失效， 则返回空
+	 * 根据用户 token 获取 session 信息， [会检查 session 是否 失效， 如果已经失效， 则返回空]
 	 * 
 	 * @param token
 	 * @return
@@ -47,7 +47,7 @@ public interface CustomerSessionMapper {
 	public void insert(CustomerSession session);
 
 	/**
-	 * 根据 token 获取 secret， 会检查 session 是否 失效， 如果已经失效， 则返回空
+	 * 根据 token 获取 secret， [会检查 session 是否 失效， 如果已经失效， 则返回空]
 	 * 
 	 * @param token
 	 * @return

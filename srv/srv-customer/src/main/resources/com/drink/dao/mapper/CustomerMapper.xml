@@ -2,21 +2,46 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!-- 这里的namespace名字必须为执行该sql的dao地址&nbsp; -->
-<mapper namespace="com.drink.dao.mapper.CustomerSessionMapper">
-	<resultMap id="customerSessionMap" type="com.drink.srv.info.CustomerSession" >
-		<result property="cid" 			column="cid"/>
-		<result property="token" 		column="token"/>
-		<result property="secret" 		column="secret" />
-		<result property="client" 		column="client" />
-		<result property="lat" 			column="lat"/>
-		<result property="lng" 			column="lng"/>
-		<result property="expire_at" 	column="expireAt"/>
+<mapper namespace="com.drink.dao.mapper.CustomerMapper">
+	<resultMap id="customerMap" type="com.drink.srv.info.Customer">
+		<result property="cid" column="cid" />
+		<result property="countryCode" column="country_code" />
+		<result property="cityId" column="city_id" />
+		<result property="mobile" column="mobile" />
+		<result property="nickname" column="nickname" />
+		<result property="gender" column="gender" />
+		<result property="password" column="password" />
+		<result property="photo" column="photo" />
+		<result property="email" column="email" />
 	</resultMap>
-	
-    <select id="getSessionByToken" parameterType="String" resultMap="customerSessionMap" >  
+
+	<select id="getCustomerByCid" parameterType="Long" resultMap="customerMap">  
         <![CDATA[ 
-            SELECT * FROM t_customer_session WHERE token =  #{token}
-        ]]>   
-    </select>
-    
+            select cid,country_code,city_id,mobile,nickname,gender,password,photo from t_customer_session where token =  #{cid}
+        ]]>
+	</select>
+
+	<select id="getCustomerByPhone" parameterType="String"
+		resultMap="customerMap">  
+        <![CDATA[ 
+            select cid,country_code,city_id,mobile,nickname,gender,password,photo from t_customer_session where token =  #{phone}
+        ]]>
+	</select>
+
+	<select id="getCustomerIdByPhone" parameterType="String"
+		resultMap="String">  
+        <![CDATA[ 
+            select cid from t_customer_session where token =  #{phone}
+        ]]>
+	</select>
+
+	<insert id="insert" parameterType="com.drink.srv.info.Customer">
+		insert into
+		t_customer(cid,country_code,city_id,mobile,nickname,gender,password,photo)
+		values(#{cid}, #{countryCode}, #{cityId}, #{mobile}, #{nickname},
+		#{gender},
+		#{password}, #{photo}, #{email})
+	</insert>
+
+
 </mapper>

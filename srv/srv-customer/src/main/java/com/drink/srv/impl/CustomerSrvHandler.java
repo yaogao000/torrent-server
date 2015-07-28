@@ -16,7 +16,6 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 	@Autowired
 	private CustomerService customerService;
 
-	private final int KEY_TIME_OUT_CUSTOMER_SESSION = 60 * 60 * 1000;// 1 hour
 
 	@Override
 	public CustomerSession login(String phone, String password, short countryCode, CustomerSession session) throws SrvException, TException {
@@ -36,7 +35,8 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 		RandomToken token = RandomToken.build();
 		session.setToken(token.getToken());
 		session.setSecret(token.getSecret());
-		session.setExpireAt(System.currentTimeMillis() + KEY_TIME_OUT_CUSTOMER_SESSION);
+		session.setExpireAt(System.currentTimeMillis() + CustomerService.KEY_TIME_OUT_CUSTOMER_SESSION * 1000);
+		session.setStatus((byte)1);
 		
 		CustomerSession local = customerService.getSessionByCid(cid);
 		if(local == null){
@@ -55,6 +55,7 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 			local.setCityId(session.getCityId());
 			local.setLat(session.getLat());
 			local.setLng(session.getLng());
+			local.setStatus(session.getStatus());
 			customerService.saveOrUpdate(local, false);
 		}
 		

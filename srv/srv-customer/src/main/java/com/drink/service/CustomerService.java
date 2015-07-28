@@ -69,7 +69,8 @@ public class CustomerService {
 		});
 	}
 
-	private final int KEY_TIME_OUT_CUSTOMER = 60 * 60;// 1 hour
+	public final static int KEY_TIME_OUT_CUSTOMER = 60 * 60;// 1 hour
+	public final static int KEY_TIME_OUT_CUSTOMER_SESSION = 60 * 60;// 1 hour
 
 	/**
 	 * 保存 用户信息 ，并加入 缓存， 缓存 信息为 [{cid : customer}, {mobile : customer}, {mobile, cid}]
@@ -100,11 +101,11 @@ public class CustomerService {
 		}
 		
 		// 缓存 session 信息， key 为 token
-		customerSessionRedisCache.put(session.getToken(), session, session.getExpireAt(), TimeUnit.MICROSECONDS);
+		customerSessionRedisCache.put(session.getToken(), session, KEY_TIME_OUT_CUSTOMER_SESSION, TimeUnit.SECONDS);
 		// 缓存 secret 信息， key 为 token
-		customerSessionRedisCache.put(String.format("s_%s", session.getToken()), session.getSecret(), session.getExpireAt(), TimeUnit.MICROSECONDS);
+		customerSessionRedisCache.put(String.format("s_%s", session.getToken()), session.getSecret(), KEY_TIME_OUT_CUSTOMER_SESSION, TimeUnit.SECONDS);
 		// 缓存 cid 信息， key 为 token
-		customerSessionRedisCache.put(String.format("c_%s", session.getToken()), session.getCid(), session.getExpireAt(), TimeUnit.MICROSECONDS);
+		customerSessionRedisCache.put(String.format("c_%s", session.getToken()), session.getCid(), KEY_TIME_OUT_CUSTOMER_SESSION, TimeUnit.SECONDS);
 
 	}
 
