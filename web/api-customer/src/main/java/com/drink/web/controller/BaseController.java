@@ -26,5 +26,7 @@ public class BaseController {
 
 		public final static String CONS_TOKEN = AbstractFirstFilter.ACCESS_KEY_TOKEN;
 		public final static String CONS_SECRET = AbstractFirstFilter.ACCESS_SECRET;
+		
+		public static final String CONS_SMS_TYPE = "type";
 	}
 }

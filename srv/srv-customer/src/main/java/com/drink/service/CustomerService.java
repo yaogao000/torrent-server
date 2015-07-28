@@ -2,6 +2,7 @@ package com.drink.service;
 
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,5 +133,41 @@ public class CustomerService {
 	 */
 	public CustomerSession getSessionByCid(long cid) {
 		return customerSessionMapper.getSessionByCid(cid);
+	}
+	
+	
+	public boolean checkCaptcha(String phone, String captcha, short countryCode) {
+		String key = String.format("a_c_%s", phone);// auth code 
+		String captchaCode = customerRedisCache.get(key, String.class);
+		if (captchaCode != null) {
+			if (captchaCode.equalsIgnoreCase(captcha)) {
+				customerRedisCache.remove(key);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public final static int KEY_TIME_OUT_CAPTCHA = 5*60; // 5 minutes
+
+	/**
+	 * 先检查上次发送的验证码是否还有效，如果有效，则发送上次的验证码， 如果已经失效，或者不存在，则重新生成验证码，并发送
+	 * 
+	 * @param phone
+	 * @param type
+	 * @param countryCode
+	 */
+	public void captcha(String phone, int type, int countryCode) {
+		String key = String.format("a_c_%s", phone);// auth code
+		String captchaCode = customerRedisCache.get(key, String.class);
+		if (captchaCode == null) {
+			// 生成验证码并发送
+			captchaCode = RandomStringUtils.randomNumeric(4);
+			customerRedisCache.put(key, captchaCode, KEY_TIME_OUT_CAPTCHA, TimeUnit.SECONDS);
+		}
+
+		// TODO 短信发送
+		// int msgType = (type == 1 ? 1: 2);
+		// smsSrv.sendSms(msgType, data);
 	}
 }

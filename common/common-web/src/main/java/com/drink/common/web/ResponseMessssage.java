@@ -31,7 +31,7 @@ public class ResponseMessssage {
 	public static final String STATUS_MESSAGE_200 = "Request Successfully";
 	public static final String STATUS_MESSAGE_400 = "Request Error!";
 
-	public final static String FORMAT_ERROR = "Invalid {0} with {1}";
+	public final static String FORMAT_ERROR_ILLEGAL = "Invalid {0} with {1}";
 	public final static String FORMAT_ERROR_REQUIRED = "Required parameter {0} is not present";
 	public final static String FORMAT_ERROR_UNSUPPORT = "Unsupport operation";
 	
@@ -65,8 +65,8 @@ public class ResponseMessssage {
 		
 	}
 
-	public static String buildErrorMessage(String key, String value) {
-		return MessageFormat.format(FORMAT_ERROR, "'" + key + "'", value);
+	public static String buildIllegalMessage(String key, String value) {
+		return MessageFormat.format(FORMAT_ERROR_ILLEGAL, "'" + key + "'", value);
 	}
 
 	public static String buildRequiredErrorMessage(String key) {

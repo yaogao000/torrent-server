@@ -1,9 +1,9 @@
-package com.drink.common;
+package com.drink.common.security;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class MD5Util {
+public class MD5Utils {
 
 	public static String MD5(String plainText) {
 		MessageDigest md;
