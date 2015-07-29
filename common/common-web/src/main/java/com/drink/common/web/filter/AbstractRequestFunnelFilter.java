@@ -3,6 +3,7 @@ package com.drink.common.web.filter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import com.drink.common.JSONUtils;
+import com.drink.common.web.IpUtils;
 import com.drink.common.web.ResponseMessssage;
 import com.drink.common.web.filter.funnel.RequestFunnel;
 
@@ -35,7 +37,7 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbstractRequestFunnelFilter.class);
 
-	private Map<String, RequestFunnel> requestFunnels;
+	private Map<String, List<RequestFunnel>> requestFunnels;
 
 	protected abstract String getKeyPrefix();
 
@@ -59,26 +61,38 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 		response.setContentType("application/json;charset=UTF-8");
 
-		RequestFunnel requestFunnel = requestFunnels.get(requestUri);
+		List<RequestFunnel> requestFunnelList = requestFunnels.get(requestUri);
 
-		String[] paramers = requestFunnel.getParameters();
-		Object[] values = new String[paramers.length];
-		for (int i = 0, length = paramers.length; i < length; i++) {
-			String value = request.getParameter(paramers[i]);
-			if (StringUtils.isBlank(value)) {// spring mvc 请求参数有默认值，如果值没有设置，则用
-												// DEFAULT 代替，这样，只要是同一个请求，就会被处理
-				values[i] = "df";// default
-			} else {
-				values[i] = value;
+		for (RequestFunnel requestFunnel : requestFunnelList) {
+			String[] paramers = requestFunnel.getParameters();
+			Object[] values = new String[paramers.length];
+			for (int i = 0, length = paramers.length; i < length; i++) {
+				String value = null;
+
+				if ("ip".equals(paramers[i])) {// ip 做特别处理
+					value = IpUtils.getIpAddr(request);
+				} else {
+					value = request.getParameter(paramers[i]);
+				}
+
+				if (StringUtils.isBlank(value)) {// spring mvc
+													// 请求参数有默认值，如果值没有设置，则用
+													// DEFAULT
+													// 代替，这样，只要是同一个请求，就会被处理
+					values[i] = "df";// default
+				} else {
+					values[i] = value;
+				}
 			}
-		}
-		String key = String.format(getKeyPrefix() + requestFunnel.getKey(), values);
 
-		if (!hasReachedUpperLimitInSomeTime(key, requestFunnel.getLimit(), requestFunnel.getTime())) {
-			filterChain.doFilter(req, resp);
-		} else {
-			String message = JSONUtils.readObject2String(ResponseMessssage.ERROR(requestFunnel.getCode(), requestFunnel.getMsg()));
-			response.getWriter().println(message);
+			String key = String.format(getKeyPrefix() + requestFunnel.getKey(), values);
+
+			if (!hasReachedUpperLimitInSomeTime(key, requestFunnel.getLimit(), requestFunnel.getTime())) {
+				filterChain.doFilter(req, resp);
+			} else {
+				String message = JSONUtils.readObject2String(ResponseMessssage.ERROR(requestFunnel.getCode(), requestFunnel.getMsg()));
+				response.getWriter().println(message);
+			}
 		}
 	}
 
@@ -100,12 +114,14 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 			}
 		} catch (IOException e) {
 			logger.error("unable to load funnels file", e);
+			return;
 		} finally {
 			if (null != reader) {
 				try {
 					reader.close();
 				} catch (IOException e) {
 					logger.error(e.getMessage(), e);
+					return;
 				}
 				reader = null;
 			}
@@ -157,7 +173,21 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 				requestFunnel.setMsg(ResponseMessssage.REQ_OVERFLOW.getMessage());
 			}
 
-			requestFunnels.put(requestFunnel.getApi(), requestFunnel);
+			String key = requestFunnel.getApi();
+			int index = -1;
+			if ((index = key.lastIndexOf(".do")) != -1) {
+				key = key.substring(0, index);
+			}
+
+			List<RequestFunnel> list = requestFunnels.get(key);
+			if (null == list) {
+				list = new ArrayList<>();
+				list.add(requestFunnel);
+				requestFunnels.put(key, list);
+			} else {
+				list.add(requestFunnel);
+			}
+
 		}
 	}
 
