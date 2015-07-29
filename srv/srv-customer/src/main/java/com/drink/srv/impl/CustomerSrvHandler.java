@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.drink.common.RandomToken;
 import com.drink.redis.JedisService;
+import com.drink.service.CacheKey;
 import com.drink.service.CustomerService;
 import com.drink.srv.CustomerSrv;
 import com.drink.srv.info.Customer;
@@ -21,7 +22,7 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 
 	@Override
 	public CustomerSession login(String phone, String password, short countryCode, CustomerSession session) throws SrvException, TException {
-		long cid = customerService.getCustomerIdByPhone(phone);
+		long cid = customerService.getCustomerIdByPhone(phone);//TODO BUG: 凡是确认数据库里是否存在的，都需要直接从数据库里查询
 		if (cid <= 0) {
 			// save customer
 			Customer customer = new Customer();
@@ -37,7 +38,7 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 		RandomToken token = RandomToken.build();
 		session.setToken(token.getToken());
 		session.setSecret(token.getSecret());
-		session.setExpireAt(System.currentTimeMillis() + CustomerService.KEY_TIME_OUT_CUSTOMER_SESSION * 1000);
+		session.setExpireAt(System.currentTimeMillis() + CacheKey.Timeout.CUSTOMER_SESSION * 1000);
 		session.setStatus((byte) 1);
 
 		CustomerSession local = customerService.getSessionByCid(cid);

@@ -45,11 +45,16 @@ public class CustomerService {
 	 * @return
 	 */
 	public Customer getCustomerByPhone(String phone) {
-		return customerRedisCache.get(phone, Customer.class, new CacheCallback() {
+		return customerRedisCache.get(String.format(CacheKey.Format.CUSTOMER_WITH_PHONE, phone), Customer.class, new CacheCallback() {
 
 			@Override
 			public Object load(String key) {
 				return customerMapper.getCustomerByPhone(key);
+			}
+			
+			@Override
+			public int getTimeout() {
+				return CacheKey.Timeout.CUSTOMER;
 			}
 		});
 	}
@@ -61,17 +66,19 @@ public class CustomerService {
 	 * @return
 	 */
 	public long getCustomerIdByPhone(String phone) {
-		return customerRedisCache.get(String.format("c_%s", phone), Long.class, new CacheCallback() {
+		return customerRedisCache.get(String.format(CacheKey.Format.CUSTOMER_ID_WITH_PHONE, phone), Long.class, new CacheCallback() {
 
 			@Override
 			public Object load(String key) {
 				return customerMapper.getCustomerIdByPhone(key);
 			}
+			
+			@Override
+			public int getTimeout() {
+				return CacheKey.Timeout.CUSTOMER;
+			}
 		});
 	}
-
-	public final static int KEY_TIME_OUT_CUSTOMER = 60 * 60;// 1 hour
-	public final static int KEY_TIME_OUT_CUSTOMER_SESSION = 60 * 60;// 1 hour
 
 	/**
 	 * 保存 用户信息 ，并加入 缓存， 缓存 信息为 [{cid : customer}, {mobile : customer}, {mobile, cid}]
@@ -80,8 +87,9 @@ public class CustomerService {
 	 */
 	public void save(Customer customer) {
 		customerMapper.insert(customer);
-		customerRedisCache.put(new String[] { String.valueOf(customer.getCid()), customer.getMobile() }, customer, KEY_TIME_OUT_CUSTOMER, TimeUnit.SECONDS);
-		customerRedisCache.put(String.format("c_%s", customer.getMobile()), customer.getCid());
+		customerRedisCache.put(new String[] { String.format(CacheKey.Format.CUSTOMER_WITH_CID, customer.getCid()), String.format(CacheKey.Format.CUSTOMER_WITH_PHONE, customer.getMobile()) },
+				customer, CacheKey.Timeout.CUSTOMER, TimeUnit.SECONDS);
+		customerRedisCache.put(String.format(CacheKey.Format.CUSTOMER_ID_WITH_PHONE, customer.getMobile()), customer.getCid(), CacheKey.Timeout.CUSTOMER, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -102,11 +110,11 @@ public class CustomerService {
 		}
 		
 		// 缓存 session 信息， key 为 token
-		customerSessionRedisCache.put(session.getToken(), session, KEY_TIME_OUT_CUSTOMER_SESSION, TimeUnit.SECONDS);
+		customerSessionRedisCache.put(String.format(CacheKey.Format.CUSTOMER_SESSION_WITH_TOKEN, session.getToken()), session, CacheKey.Timeout.CUSTOMER_SESSION, TimeUnit.SECONDS);
 		// 缓存 secret 信息， key 为 token
-		customerSessionRedisCache.put(String.format("s_%s", session.getToken()), session.getSecret(), KEY_TIME_OUT_CUSTOMER_SESSION, TimeUnit.SECONDS);
+		customerSessionRedisCache.put(String.format(CacheKey.Format.CUSTOMER_SESSION_SECRET_WITH_TOKEN, session.getToken()), session.getSecret(), CacheKey.Timeout.CUSTOMER_SESSION, TimeUnit.SECONDS);
 		// 缓存 cid 信息， key 为 token
-		customerSessionRedisCache.put(String.format("c_%s", session.getToken()), session.getCid(), KEY_TIME_OUT_CUSTOMER_SESSION, TimeUnit.SECONDS);
+		customerSessionRedisCache.put(String.format(CacheKey.Format.CUSTOMER_SESSION_CID_WITH_TOKEN, session.getToken()), session.getCid(), CacheKey.Timeout.CUSTOMER_SESSION, TimeUnit.SECONDS);
 
 	}
 
@@ -117,11 +125,16 @@ public class CustomerService {
 	 * @return
 	 */
 	public String getSecretByToken(String token) {
-		return customerSessionRedisCache.get(String.format("s_%s", token), String.class, new CacheCallback() {
+		return customerSessionRedisCache.get(String.format(CacheKey.Format.CUSTOMER_SESSION_SECRET_WITH_TOKEN, token), String.class, new CacheCallback() {
 
 			@Override
 			public Object load(String key) {
 				return customerSessionMapper.getSecretByToken(key);
+			}
+			
+			@Override
+			public int getTimeout() {
+				return CacheKey.Timeout.CUSTOMER_SESSION;
 			}
 		});
 	}
@@ -137,7 +150,8 @@ public class CustomerService {
 	
 	
 	public boolean checkCaptcha(String phone, String captcha, short countryCode) {
-		String key = String.format("a_c_%s", phone);// auth code 
+		
+		String key = String.format(CacheKey.Format.CUSTOMER_CAPTCHA_WITH_PHONE, phone);// auth code 
 		String captchaCode = customerRedisCache.get(key, String.class);
 		if (captchaCode != null) {
 			if (captchaCode.equalsIgnoreCase(captcha)) {
@@ -148,8 +162,6 @@ public class CustomerService {
 		return false;
 	}
 
-	public final static int KEY_TIME_OUT_CAPTCHA = 5*60; // 5 minutes
-
 	/**
 	 * 先检查上次发送的验证码是否还有效，如果有效，则发送上次的验证码， 如果已经失效，或者不存在，则重新生成验证码，并发送
 	 * 
@@ -158,12 +170,12 @@ public class CustomerService {
 	 * @param countryCode
 	 */
 	public void captcha(String phone, int type, int countryCode) {
-		String key = String.format("a_c_%s", phone);// auth code
+		String key = String.format(CacheKey.Format.CUSTOMER_CAPTCHA_WITH_PHONE, phone);// auth code 
 		String captchaCode = customerRedisCache.get(key, String.class);
 		if (captchaCode == null) {
 			// 生成验证码并发送
 			captchaCode = RandomStringUtils.randomNumeric(4);
-			customerRedisCache.put(key, captchaCode, KEY_TIME_OUT_CAPTCHA, TimeUnit.SECONDS);
+			customerRedisCache.put(key, captchaCode, CacheKey.Timeout.CUSTOMER_CAPTCHA, TimeUnit.SECONDS);
 		}
 		logger.info("captchaCode: " + captchaCode);
 		// TODO 短信发送

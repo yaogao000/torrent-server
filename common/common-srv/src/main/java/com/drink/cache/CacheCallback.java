@@ -1,5 +1,7 @@
 package com.drink.cache;
 
+import java.util.concurrent.TimeUnit;
+
 public abstract class CacheCallback {
 	/**
 	 * load data from container
@@ -16,5 +18,13 @@ public abstract class CacheCallback {
 	 */
 	public boolean needBeCached() {
 		return true;
+	}
+
+	public int getTimeout() {
+		return 0;
+	}
+
+	public TimeUnit getTimeUnit() {
+		return TimeUnit.SECONDS;
 	}
 }

@@ -70,7 +70,11 @@ public class RedisCache implements ICache {
 			
 			if(null != result && callback.needBeCached()){
 				// 加入 缓存
-				this.put(key, result);
+				if(callback.getTimeout() > 0){
+					this.put(key, result, callback.getTimeout(), callback.getTimeUnit());
+				}else{
+					this.put(key, result);
+				}
 			}
 			
 			return result;
