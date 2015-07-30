@@ -44,10 +44,10 @@ public class CustomerController extends BaseController {
 			return ResponseMessssage.ERROR(ResponseMessssage.buildIllegalMessage(Constants.CONS_PHONE, phone));
 		}
 		
-		String aeskey = "";
-		// 验证 aes 是否 被 有效的 rsa public key 加密
 		//测试阶段 不做 加密处理
-
+		String aeskey = "12345678910111213";
+		// 验证 aes 是否 被 有效的 rsa public key 加密
+//		String aeskey = null;
 //		try {
 //			aeskey = new String(RSAUtils.decryptByPrivateKey(__aeskey.getBytes(), getRSAPrivateKey()));
 //		} catch (Exception e) {
@@ -70,6 +70,7 @@ public class CustomerController extends BaseController {
 
 		Map<String, Object> result = new HashMap<>();
 		result.put(Constants.CONS_TOKEN, session.getToken());
+		logger.info("secret: " + session.getSecret());
 		try {
 			result.put(Constants.CONS_SECRET, AESUtils.encrypt(session.getSecret(), aeskey));
 		} catch (Exception e) {
