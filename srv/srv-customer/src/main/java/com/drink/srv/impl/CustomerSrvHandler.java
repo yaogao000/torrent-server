@@ -4,6 +4,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.drink.common.RandomToken;
@@ -32,12 +33,11 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 
 	@Override
 	public CustomerSession login(String phone, String password, short countryCode, CustomerSession session) throws SrvException, TException {
-		long cid = 0;
-		GlobalLock customerLock = globalLockRedisFactory.getLock(String.format(GlobalLockKey.Format.CUSTOMER_WITH_PHONE, phone), 10 * 1000);
+		GlobalLock customerLock = globalLockRedisFactory.getLock(String.format(GlobalLockKey.Format.CUSTOMER_WITH_PHONE, phone), GlobalLockKey.Timeout.CUSTOMER);
 		try {
 			customerLock.lock();
 
-			cid = customerService.getCustomerIdByPhone(phone);
+			long cid = customerService.getCustomerIdByPhone(phone);
 			if (cid <= 0) {
 				// save customer
 				Customer customer = new Customer();
@@ -54,24 +54,14 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 				}
 				cid = customer.getCid();// 取出cid
 			}
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			throw new SrvException(SrvExceptionResponse.Code.CUSTOMER_MULTI_LOGIN, SrvExceptionResponse.Message.CUSTOMER_MULTI_LOGIN, e.getMessage());
-		} finally {
-			customerLock.unlock();
-		}
-
-		RandomToken token = RandomToken.build();
-		session.setCid(cid);// 设置用户 cid
-		session.setToken(token.getToken());
-		session.setSecret(token.getSecret());
-		session.setExpireAt(System.currentTimeMillis() + CacheKey.Timeout.CUSTOMER_SESSION * 1000);
-		session.setStatus((byte) 1);
-
-		GlobalLock customerSessionLock = globalLockRedisFactory.getLock(String.format(GlobalLockKey.Format.CUSTOMER_WITH_PHONE, phone), 10 * 1000);
-		try {
-			customerSessionLock.lock();
-
+			
+			RandomToken token = RandomToken.build();
+			session.setCid(cid);// 设置用户 cid
+			session.setToken(token.getToken());
+			session.setSecret(token.getSecret());
+			session.setExpireAt(System.currentTimeMillis() + CacheKey.Timeout.CUSTOMER_SESSION * 1000);
+			session.setStatus((byte) 1);
+			
 			CustomerSession local = customerService.getSessionByCid(cid);
 			if (local == null) {
 				// 保存 session 并存入 redis 中
@@ -82,12 +72,13 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 				}
 				customerService.saveOrUpdate(session, false);
 			}
-		} catch (Exception e) {
+		} catch (DataAccessException e) {// catch DataAccessException
 			logger.error(e.getMessage(), e);
 			throw new SrvException(SrvExceptionResponse.Code.CUSTOMER_MULTI_LOGIN, SrvExceptionResponse.Message.CUSTOMER_MULTI_LOGIN, e.getMessage());
 		} finally {
-			customerSessionLock.unlock();
+			customerLock.unlock();
 		}
+
 		return session;
 	}
 
