@@ -25,9 +25,9 @@ public class FirstFilter extends AbstractFirstFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(FirstFilter.class);
 
-	@Qualifier("customerRedisCache")
+	@Qualifier("customerSessionRedisCache")
 	@Autowired
-	private RedisCache customerRedisCache;
+	private RedisCache customersessionRedisCache;
 
 	@Autowired
 	private CustomerSrv.Iface customerSrv;
@@ -35,18 +35,22 @@ public class FirstFilter extends AbstractFirstFilter {
 	/**
 	 * 根据token 取得 secret
 	 * */
-	protected String getAccessSecret(String key) {
+	protected String getAccessSecret(final String accessKey) {
 		try {
-			if (StringUtils.isBlank(key)) {
-				logger.info(String.format("FirstFilter-->getAccessSecret: The parameter token [%s] is null or empty.", key));
+			if (StringUtils.isBlank(accessKey)) {
+				logger.info(String.format("FirstFilter-->getAccessSecret: The parameter token [%s] is null or empty.", accessKey));
 				return null;
 			}
-			return customerRedisCache.get(key, String.class, new CacheCallback() {
-
+			return customersessionRedisCache.get(accessKey, String.class, new CacheCallback() {
 				@Override
-				public Object load(String key) {
+				public String getOriginKey(){
+					return accessKey;
+				}
+				
+				@Override
+				public Object load(String cacheKey) {
 					try {
-						return customerSrv.getSecretByToken(key);
+						return customerSrv.getSecretByToken(this.getOriginKey());
 					} catch (TException e) {
 						return null;
 					}
@@ -59,8 +63,8 @@ public class FirstFilter extends AbstractFirstFilter {
 			});
 
 		} catch (Exception e) {
-			logger.error(String.format("FirstFilter-->getAccessSecret for token[%s] error", key), e);
-			throw new RuntimeException(String.format("FirstFilter-->getAccessSecret for token[%s] error", key), e);
+			logger.error(String.format("FirstFilter-->getAccessSecret for token[%s] error", accessKey), e);
+			throw new RuntimeException(String.format("FirstFilter-->getAccessSecret for token[%s] error", accessKey), e);
 		}
 	}
 

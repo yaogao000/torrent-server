@@ -1,4 +1,4 @@
-package com.drink;
+package com.drink.srv.support;
 
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;

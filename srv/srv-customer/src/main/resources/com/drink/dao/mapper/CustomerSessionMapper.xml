@@ -44,5 +44,8 @@
 		token=#{token},secret=#{secret},client=#{client},lat=#{lat},lng=#{lng},expire_at=#{expireAt}, status=#{status}
 		where cid = #{cid}
 	</update>
-
+	
+	<update id="expireSession" parameterType="String">
+		update t_customer_session set status = 0 where token = #{token}
+	</update>
 </mapper>

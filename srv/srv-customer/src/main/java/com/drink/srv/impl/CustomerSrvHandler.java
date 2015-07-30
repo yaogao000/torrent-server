@@ -1,13 +1,18 @@
 package com.drink.srv.impl;
 
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.drink.common.RandomToken;
-import com.drink.redis.JedisService;
-import com.drink.service.CacheKey;
+import com.drink.lock.GlobalLock;
+import com.drink.lock.GlobalLockRedisFactory;
 import com.drink.service.CustomerService;
+import com.drink.service.constants.CacheKey;
+import com.drink.service.constants.GlobalLockKey;
+import com.drink.service.constants.SrvExceptionResponse;
 import com.drink.srv.CustomerSrv;
 import com.drink.srv.info.Customer;
 import com.drink.srv.info.CustomerSession;
@@ -15,53 +20,74 @@ import com.drink.srv.support.SrvException;
 
 @Service("remoteCustomerSrv")
 public class CustomerSrvHandler implements CustomerSrv.Iface {
+	private final static Logger logger = LoggerFactory.getLogger(CustomerSrvHandler.class);
+
 	@Autowired
 	private CustomerService customerService;
 	@Autowired
-	private JedisService jedisService;
+	private GlobalLockRedisFactory globalLockRedisFactory;
+
+	// @Autowired
+	// private JedisService jedisService;
 
 	@Override
 	public CustomerSession login(String phone, String password, short countryCode, CustomerSession session) throws SrvException, TException {
-		long cid = customerService.getCustomerIdByPhone(phone);//TODO BUG: 凡是确认数据库里是否存在的，都需要直接从数据库里查询
-		if (cid <= 0) {
-			// save customer
-			Customer customer = new Customer();
-			customer.setCountryCode(countryCode);
-			customer.setCityId(session.getCityId());
-			customer.setMobile(phone);
+		long cid = 0;
+		GlobalLock customerLock = globalLockRedisFactory.getLock(String.format(GlobalLockKey.Format.CUSTOMER_WITH_PHONE, phone), 10 * 1000);
+		try {
+			customerLock.lock();
 
-			// 保存 customer, 并存入 redis 中，
-			customerService.save(customer);
-			cid = customer.getCid();// 取出cid
+			cid = customerService.getCustomerIdByPhone(phone);
+			if (cid <= 0) {
+				// save customer
+				Customer customer = new Customer();
+				customer.setCountryCode(countryCode);
+				customer.setCityId(session.getCityId());
+				customer.setMobile(phone);
+				customer.setPassword(password);// TODO 密码加密
+
+				// 保存 customer
+				try {
+					customerService.insert(customer);
+				} catch (Exception e) {
+					throw new SrvException();
+				}
+				cid = customer.getCid();// 取出cid
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw new SrvException(SrvExceptionResponse.Code.CUSTOMER_MULTI_LOGIN, SrvExceptionResponse.Message.CUSTOMER_MULTI_LOGIN, e.getMessage());
+		} finally {
+			customerLock.unlock();
 		}
 
 		RandomToken token = RandomToken.build();
+		session.setCid(cid);// 设置用户 cid
 		session.setToken(token.getToken());
 		session.setSecret(token.getSecret());
 		session.setExpireAt(System.currentTimeMillis() + CacheKey.Timeout.CUSTOMER_SESSION * 1000);
 		session.setStatus((byte) 1);
 
-		CustomerSession local = customerService.getSessionByCid(cid);
-		if (local == null) {
-			session.setCid(cid);// 设置用户 cid
-			// 保存 session 并存入 redis 中
-			customerService.saveOrUpdate(session, true);
-		} else {
-			if (local.getCityId() != session.getCityId()) {
-				// TODO 推送消息给用户，安全问题， 或者 系统 根据 城市id 变动，进行不同的推销活动
-			}
-			local.setToken(session.getToken());
-			local.setSecret(session.getSecret());
-			local.setExpireAt(session.getExpireAt());
-			local.setAeskey(session.getAeskey());
-			local.setClient(session.getClient());
-			local.setCityId(session.getCityId());
-			local.setLat(session.getLat());
-			local.setLng(session.getLng());
-			local.setStatus(session.getStatus());
-			customerService.saveOrUpdate(local, false);
-		}
+		GlobalLock customerSessionLock = globalLockRedisFactory.getLock(String.format(GlobalLockKey.Format.CUSTOMER_WITH_PHONE, phone), 10 * 1000);
+		try {
+			customerSessionLock.lock();
 
+			CustomerSession local = customerService.getSessionByCid(cid);
+			if (local == null) {
+				// 保存 session 并存入 redis 中
+				customerService.saveOrUpdate(session, true);
+			} else {
+				if (local.getCityId() != session.getCityId()) {
+					// TODO 推送消息给用户，安全问题， 或者 系统 根据 城市id 变动，进行不同的推销活动
+				}
+				customerService.saveOrUpdate(session, false);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw new SrvException(SrvExceptionResponse.Code.CUSTOMER_MULTI_LOGIN, SrvExceptionResponse.Message.CUSTOMER_MULTI_LOGIN, e.getMessage());
+		} finally {
+			customerSessionLock.unlock();
+		}
 		return session;
 	}
 
@@ -79,7 +105,7 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 	public boolean checkCaptcha(String phone, String captcha, short countryCode) throws SrvException, TException {
 		return customerService.checkCaptcha(phone, captcha, countryCode);
 	}
-	
+
 	/**
 	 * 先检查上次发送的验证码是否还有效，如果有效，则发送上次的验证码， 如果已经失效，或者不存在，则重新生成验证码，并发送
 	 */
@@ -88,4 +114,13 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 		customerService.captcha(phone, type, countryCode);
 	}
 
+	/**
+	 * 用户登出
+	 * 
+	 * @param token
+	 */
+	@Override
+	public void signout(String token) throws TException, SrvException {
+		customerService.signout(token);
+	}
 }

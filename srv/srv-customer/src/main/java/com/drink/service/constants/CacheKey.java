@@ -1,4 +1,4 @@
-package com.drink.service;
+package com.drink.service.constants;
 
 /**
  * cache key format and timeout
@@ -18,7 +18,7 @@ public final class CacheKey {
 
 		// customer cache key, prefix is c_
 		public final static String CUSTOMER_WITH_PHONE = "%s"; // c_[phone]
-		public final static String CUSTOMER_WITH_CID = "i_%s"; // c_i_[phone]
+		public final static String CUSTOMER_WITH_CID = "i_%s"; // c_i_[cid]
 		public final static String CUSTOMER_ID_WITH_PHONE = "c_%s"; // c_c_[phone]
 		public final static String CUSTOMER_CAPTCHA_WITH_PHONE = "a_c_%s";// c_a_c_[phone]
 

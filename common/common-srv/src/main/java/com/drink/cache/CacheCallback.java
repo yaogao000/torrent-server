@@ -4,12 +4,20 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class CacheCallback {
 	/**
+	 * 
+	 * @return the key is used to laod resource from database or other container
+	 */
+	public abstract String getOriginKey();
+
+	/**
 	 * load data from container
 	 * 
-	 * @param key
+	 * @param cacheKey
+	 *            has add cachePrefix to originKey
+	 * 
 	 * @return
 	 */
-	public abstract Object load(String key);
+	public abstract Object load(String cacheKey);
 
 	/**
 	 * mark the loaded object should be cached or not
@@ -20,10 +28,20 @@ public abstract class CacheCallback {
 		return true;
 	}
 
+	/**
+	 * if need set timeout, please set the timeout value
+	 * 
+	 * @return
+	 */
 	public int getTimeout() {
 		return 0;
 	}
 
+	/**
+	 * timeout unit
+	 * 
+	 * @return
+	 */
 	public TimeUnit getTimeUnit() {
 		return TimeUnit.SECONDS;
 	}

@@ -12,4 +12,6 @@ service CustomerSrv {
 	void generateCaptcha(1: required string phone, 2: required i16 type, 3: required i16 countryCode) throws(1: exp.SrvException ex);
 
 	#i16 signIn(1: required string phone, 2: required string password) throws(1: exp.SrvException ex);
+
+	void signout(1:required string token)  throws(1: exp.SrvException ex);
 }

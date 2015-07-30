@@ -40,9 +40,9 @@ public class ResponseMessssage {
 	public static final ResponseMessssage INVALID_TOKEN = new ResponseMessssage(101,"Invalid token or appkey!");
 	public static final ResponseMessssage NULL_TOKEN = new ResponseMessssage(101,"Invalid token or appkey,is null!");
 	public static final ResponseMessssage INVALID_AESKEY = new ResponseMessssage(102,"Invalid __aeskey!");
-	public static final ResponseMessssage IP_REQ_OVERFLOW = new ResponseMessssage(998,"Request ip over flow");
-	public static final ResponseMessssage REQ_OVERFLOW = new ResponseMessssage(998,"Request over flow");
-	public static final ResponseMessssage FILTER_UNKNOW_ERROR = new ResponseMessssage(999,"Filter Unkown Error");
+	public static final ResponseMessssage IP_REQ_OVERFLOW = new ResponseMessssage(103,"Request ip over flow");
+	public static final ResponseMessssage REQ_OVERFLOW = new ResponseMessssage(103,"Request over flow");
+	public static final ResponseMessssage FILTER_UNKNOW_ERROR = new ResponseMessssage(104,"Filter Unkown Error");
 	
 	public static String NULL_SIG_STR;
 	public static String INVALID_SIG_STR;

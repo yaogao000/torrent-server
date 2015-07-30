@@ -1,5 +1,6 @@
 package com.drink.cache;
 
+import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 public interface ICache {
@@ -10,7 +11,7 @@ public interface ICache {
 	 * @param value
 	 */
 	void put(String key, Object value) throws CacheException;
-	
+
 	/**
 	 * put multiple key value pair to cache
 	 * 
@@ -28,7 +29,7 @@ public interface ICache {
 	 * @param unit
 	 */
 	void put(String key, Object value, long timeout, TimeUnit unit) throws CacheException;
-	
+
 	/**
 	 * put multiple key value pair to cache
 	 * 
@@ -60,9 +61,17 @@ public interface ICache {
 	<T> T get(String key, Class<T> type, CacheCallback callback) throws CacheException;
 
 	/**
-	 * remove value from cache
+	 * remove key from cache
 	 * 
 	 * @param key
 	 */
 	void remove(String key) throws CacheException;
+
+	/**
+	 * remove keys from cache
+	 * 
+	 * @param keys
+	 * @throws CacheException
+	 */
+	void remove(Collection<String> keys) throws CacheException;
 }

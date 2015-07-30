@@ -1,5 +1,8 @@
 package com.drink.cache;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,15 +26,13 @@ public class RedisCache implements ICache {
 
 	private String buildKey(String key) {
 		if (StringUtils.isBlank(cacheKeyPrefix)) {
-			throw new NullPointerException(
-					"please setting the cacheKeyPrefix parameter");
+			throw new NullPointerException("please setting the cacheKeyPrefix parameter");
 		}
 		return cacheKeyPrefix + key;
 	}
 
 	@Override
-	public void put(String key, Object value, long timeout, TimeUnit unit)
-			throws CacheException {
+	public void put(String key, Object value, long timeout, TimeUnit unit) throws CacheException {
 		try {
 			String json = JSONUtils.readObject2String(value);
 			valueOps.set(buildKey(key), json, timeout, unit);
@@ -56,9 +57,9 @@ public class RedisCache implements ICache {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T get(String key, Class<T> type, CacheCallback callback)
-			throws CacheException {
-		String json = valueOps.get(buildKey(key));
+	public <T> T get(String key, Class<T> type, CacheCallback callback) throws CacheException {
+		String cacheKey = buildKey(key);
+		String json = valueOps.get(cacheKey);
 		if (StringUtils.isNotBlank(json)) {
 			try {
 				return JSONUtils.readJson2POJO(json, type);
@@ -66,17 +67,17 @@ public class RedisCache implements ICache {
 				throw new CacheException(e);
 			}
 		} else {
-			T result = (T) callback.load(key);
-			
-			if(null != result && callback.needBeCached()){
+			T result = (T) callback.load(cacheKey);
+
+			if (null != result && callback.needBeCached()) {
 				// 加入 缓存
-				if(callback.getTimeout() > 0){
-					this.put(key, result, callback.getTimeout(), callback.getTimeUnit());
-				}else{
-					this.put(key, result);
+				if (callback.getTimeout() > 0) {
+					this.put(cacheKey, result, callback.getTimeout(), callback.getTimeUnit());
+				} else {
+					this.put(cacheKey, result);
 				}
 			}
-			
+
 			return result;
 		}
 	}
@@ -84,18 +85,6 @@ public class RedisCache implements ICache {
 	@Override
 	public void remove(String key) throws CacheException {
 		valueOps.getOperations().delete(buildKey(key));
-	}
-
-	public void setValueOps(ValueOperations<String, String> valueOps) {
-		this.valueOps = valueOps;
-	}
-
-	public String getCacheKeyPrefix() {
-		return cacheKeyPrefix;
-	}
-
-	public void setCacheKeyPrefix(String cacheKeyPrefix) {
-		this.cacheKeyPrefix = cacheKeyPrefix;
 	}
 
 	@Override
@@ -111,8 +100,7 @@ public class RedisCache implements ICache {
 	}
 
 	@Override
-	public void put(String[] keys, Object value, long timeout, TimeUnit unit)
-			throws CacheException {
+	public void put(String[] keys, Object value, long timeout, TimeUnit unit) throws CacheException {
 		try {
 			String json = JSONUtils.readObject2String(value);
 			for (String key : keys) {
@@ -124,4 +112,24 @@ public class RedisCache implements ICache {
 
 	}
 
+	@Override
+	public void remove(Collection<String> keys) throws CacheException {
+		List<String> keyList = new LinkedList<>();
+		for (String key : keys) {
+			keyList.add(buildKey(key));
+		}
+		valueOps.getOperations().delete(keyList);
+	}
+
+	public void setValueOps(ValueOperations<String, String> valueOps) {
+		this.valueOps = valueOps;
+	}
+
+	public String getCacheKeyPrefix() {
+		return cacheKeyPrefix;
+	}
+
+	public void setCacheKeyPrefix(String cacheKeyPrefix) {
+		this.cacheKeyPrefix = cacheKeyPrefix;
+	}
 }

@@ -23,7 +23,7 @@
 	</bean>
 
 
-	<bean id="customerConnectionFactory"
+	<bean id="customerSessionConnectionFactory"
 		class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
 		<property name="usePool" value="true"></property>
 		<property name="hostName" value="${redis.customer.host}" />
@@ -34,13 +34,13 @@
 		<constructor-arg index="0" ref="jedisPoolConfig" />
 	</bean>
 
-	<bean id="customerRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
-		p:connection-factory-ref="customerConnectionFactory" />
+	<bean id="customerSessionRedisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate"
+		p:connection-factory-ref="customerSessionConnectionFactory" />
 	
 	
-	<bean id="customerRedisCache" class="com.drink.cache.RedisCache">
-		<property name="valueOps" ref="customerRedisTemplate"/>
-		<property name="cacheKeyPrefix" value="${redis.key.prefix.customer}"/>
+	<bean id="customerSessionRedisCache" class="com.drink.cache.RedisCache">
+		<property name="valueOps" ref="customerSessionRedisTemplate"/>
+		<property name="cacheKeyPrefix" value="${redis.key.prefix.customerSession}"/>
 	</bean>
 	
 	<bean id="funnelConnectionFactory"
