@@ -17,21 +17,20 @@
 
 	<select id="getCustomerByCid" parameterType="Long" resultMap="customerMap">  
         <![CDATA[ 
-            select cid,country_code,city_id,mobile,nickname,gender,password,photo from t_customer_session where token =  #{cid}
+            select cid,country_code,city_id,mobile,nickname,gender,photo from t_customer where cid =  #{cid}
         ]]>
 	</select>
 
 	<select id="getCustomerByPhone" parameterType="String"
 		resultMap="customerMap">  
         <![CDATA[ 
-            select cid,country_code,city_id,mobile,nickname,gender,password,photo from t_customer_session where token =  #{phone}
+            select cid,country_code,city_id,mobile,nickname,gender,photo from t_customer where mobile =  #{phone}
         ]]>
 	</select>
 
-	<select id="getCustomerIdByPhone" parameterType="String"
-		resultMap="String">  
+	<select id="getCustomerIdByPhone" parameterType="String" resultType="Long">  
         <![CDATA[ 
-            select cid from t_customer_session where token =  #{phone}
+            select cid from t_customer where mobile =  #{phone}
         ]]>
 	</select>
 

@@ -2,7 +2,7 @@ package com.drink.cache;
 
 import java.util.concurrent.TimeUnit;
 
-public abstract class CacheCallback {
+public abstract class CacheCallback<T> {
 	/**
 	 * 
 	 * @return the key is used to laod resource from database or other container
@@ -17,7 +17,7 @@ public abstract class CacheCallback {
 	 * 
 	 * @return
 	 */
-	public abstract Object load(String cacheKey);
+	public abstract T load(String cacheKey);
 
 	/**
 	 * mark the loaded object should be cached or not
@@ -43,6 +43,6 @@ public abstract class CacheCallback {
 	 * @return
 	 */
 	public TimeUnit getTimeUnit() {
-		return TimeUnit.SECONDS;
+		return TimeUnit.MINUTES;
 	}
 }

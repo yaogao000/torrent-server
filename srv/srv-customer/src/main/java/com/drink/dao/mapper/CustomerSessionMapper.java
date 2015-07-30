@@ -1,5 +1,6 @@
 package com.drink.dao.mapper;
 
+import com.drink.srv.info.Customer;
 import com.drink.srv.info.CustomerSession;
 
 /**
@@ -59,4 +60,12 @@ public interface CustomerSessionMapper {
 	 * @param token
 	 */
 	public void expireSession(String token);
+
+	/**
+	 * 根据 用户 token 获取 用户信息
+	 * 
+	 * @param token
+	 * @return
+	 */
+	public Customer getCustomerByToken(String token);
 }

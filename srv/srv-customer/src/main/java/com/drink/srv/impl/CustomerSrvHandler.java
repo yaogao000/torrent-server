@@ -114,4 +114,9 @@ public class CustomerSrvHandler implements CustomerSrv.Iface {
 	public void signout(String token) throws TException, SrvException {
 		customerService.signout(token);
 	}
+
+	@Override
+	public Customer getCustomerByToken(String token) throws SrvException, TException {
+		return customerService.getCustomerByToken(token);
+	}
 }

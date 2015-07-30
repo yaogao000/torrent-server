@@ -154,14 +154,14 @@ public class CustomerService {
 	 * @return
 	 */
 	public String getSecretByToken(final String token) {
-		return customerSessionRedisCache.get(String.format(CacheKey.Format.CUSTOMER_SESSION_SECRET_WITH_TOKEN, token), String.class, new CacheCallback() {
+		return customerSessionRedisCache.get(String.format(CacheKey.Format.CUSTOMER_SESSION_SECRET_WITH_TOKEN, token), String.class, new CacheCallback<String>() {
 			@Override
 			public String getOriginKey() {
 				return token;
 			}
 
 			@Override
-			public Object load(String cacheKey) {
+			public String load(String cacheKey) {
 				return customerSessionMapper.getSecretByToken(this.getOriginKey());
 			}
 
@@ -205,10 +205,10 @@ public class CustomerService {
 	public void captcha(final String phone, int type, int countryCode) {
 		String cackey = String.format(CacheKey.Format.CUSTOMER_CAPTCHA_WITH_PHONE, phone);// auth
 																							// code
-		String captchaCode = customerRedisCache.get(cackey, String.class, new CacheCallback() {
+		String captchaCode = customerRedisCache.get(cackey, String.class, new CacheCallback<String>() {
 
 			@Override
-			public Object load(String cacheKey) {
+			public String load(String cacheKey) {
 				// 生成验证码
 				return RandomStringUtils.randomNumeric(4);
 			}
@@ -242,5 +242,27 @@ public class CustomerService {
 		customerSessionRedisCache.remove(keys);
 		// expire session
 		customerSessionMapper.expireSession(token);
+	}
+
+	public Customer getCustomerByToken(final String token) {
+		Customer customer = customerSessionRedisCache.get(String.format(CacheKey.Format.CUSTOMER_WITH_TOKEN, token), Customer.class, new CacheCallback<Customer>() {
+
+			@Override
+			public String getOriginKey() {
+				return token;
+			}
+
+			@Override
+			public Customer load(String cacheKey) {
+				return customerSessionMapper.getCustomerByToken(token);
+			}
+
+			@Override
+			public int getTimeout() {
+				return CacheKey.Timeout.CUSTOMER;
+			}
+
+		});
+		return customer;
 	}
 }

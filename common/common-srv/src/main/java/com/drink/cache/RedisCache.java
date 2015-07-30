@@ -55,9 +55,8 @@ public class RedisCache implements ICache {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T get(String key, Class<T> type, CacheCallback callback) throws CacheException {
+	public <T> T get(String key, Class<T> type, CacheCallback<T> callback) throws CacheException {
 		String cacheKey = buildKey(key);
 		String json = valueOps.get(cacheKey);
 		if (StringUtils.isNotBlank(json)) {
@@ -67,14 +66,19 @@ public class RedisCache implements ICache {
 				throw new CacheException(e);
 			}
 		} else {
-			T result = (T) callback.load(cacheKey);
+			T result = callback.load(cacheKey);
 
 			if (null != result && callback.needBeCached()) {
-				// 加入 缓存
-				if (callback.getTimeout() > 0) {
-					this.put(cacheKey, result, callback.getTimeout(), callback.getTimeUnit());
-				} else {
-					this.put(cacheKey, result);
+				try {
+					String callbackJson = JSONUtils.readObject2String(result);
+					// 加入 缓存
+					if (callback.getTimeout() > 0) {
+						valueOps.set(cacheKey, callbackJson, callback.getTimeout(), callback.getTimeUnit());
+					} else {
+						valueOps.set(cacheKey, callbackJson);
+					}
+				} catch (Exception e) {
+					throw new CacheException(e);
 				}
 			}
 

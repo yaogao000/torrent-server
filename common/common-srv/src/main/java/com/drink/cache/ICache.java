@@ -58,7 +58,7 @@ public interface ICache {
 	 * @return if contain the value return it, else load it from other
 	 *         containers, include database
 	 */
-	<T> T get(String key, Class<T> type, CacheCallback callback) throws CacheException;
+	<T> T get(String key, Class<T> type, CacheCallback<T> callback) throws CacheException;
 
 	/**
 	 * remove key from cache

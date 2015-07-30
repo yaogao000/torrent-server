@@ -26,7 +26,7 @@
         ]]>
 	</select>
 
-	<select id="getSecretByToken" parameterType="String" resultMap="String">  
+	<select id="getSecretByToken" parameterType="String" resultType="String">  
         <![CDATA[ 
             select secret from t_customer_session where token =  #{token} and status = 1
         ]]>
@@ -48,4 +48,8 @@
 	<update id="expireSession" parameterType="String">
 		update t_customer_session set status = 0 where token = #{token}
 	</update>
+	
+	<select id="getCustomerByToken" parameterType="String" resultMap="com.drink.dao.mapper.CustomerMapper.customerMap">
+		select c.cid,c.country_code,c.city_id,c.mobile,c.nickname,c.gender,c.photo from t_customer inner join t_customer_session s using(cid) where token = #{token}
+	</select>
 </mapper>

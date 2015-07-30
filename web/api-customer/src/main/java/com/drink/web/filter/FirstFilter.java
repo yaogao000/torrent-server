@@ -24,10 +24,11 @@ import com.drink.srv.CustomerSrv;
 public class FirstFilter extends AbstractFirstFilter {
 
 	private static final Logger logger = LoggerFactory.getLogger(FirstFilter.class);
+	public final static String CUSTOMER_SESSION_SECRET_WITH_TOKEN = "s_%s"; // c_s_s_[token]
 
 	@Qualifier("customerSessionRedisCache")
 	@Autowired
-	private RedisCache customersessionRedisCache;
+	private RedisCache customerSessionRedisCache;
 
 	@Autowired
 	private CustomerSrv.Iface customerSrv;
@@ -41,14 +42,14 @@ public class FirstFilter extends AbstractFirstFilter {
 				logger.info(String.format("FirstFilter-->getAccessSecret: The parameter token [%s] is null or empty.", accessKey));
 				return null;
 			}
-			return customersessionRedisCache.get(accessKey, String.class, new CacheCallback() {
+			return customerSessionRedisCache.get(String.format(CUSTOMER_SESSION_SECRET_WITH_TOKEN, accessKey), String.class, new CacheCallback<String>() {
 				@Override
 				public String getOriginKey(){
 					return accessKey;
 				}
 				
 				@Override
-				public Object load(String cacheKey) {
+				public String load(String cacheKey) {
 					try {
 						return customerSrv.getSecretByToken(this.getOriginKey());
 					} catch (TException e) {
