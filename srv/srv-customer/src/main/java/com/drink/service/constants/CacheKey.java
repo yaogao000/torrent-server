@@ -40,8 +40,8 @@ public final class CacheKey {
 			super();
 		}
 
-		public final static int CUSTOMER = 60 * 60;// 1 hour
-		public final static int CUSTOMER_CAPTCHA = 5*60; // 5 minutes
-		public final static int CUSTOMER_SESSION = 60 * 60;// 1 hour
+		public final static int CUSTOMER = 60;// 1 hour
+		public final static int CUSTOMER_CAPTCHA = 5; // 5 minutes
+		public final static int CUSTOMER_SESSION = 60;// 1 hour
 	}
 }
