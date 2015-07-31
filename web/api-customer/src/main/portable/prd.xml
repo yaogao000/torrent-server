@@ -4,6 +4,7 @@
     <replace key="jdbc.main.username">root</replace>
     <replace key="jdbc.main.password">abc123</replace>
     <replace key="jdbc.main.url">jdbc:mysql://localhost:3306/drink?autoReconnect=true&amp;characterEncoding=UTF-8&amp;zeroDateTimeBehavior=convertToNull</replace>
+    <replace key="debug.mode.controller">false</replace>
   </config-file>
   <config-file path="WEB-INF/classes/applicationContext.xml">
   </config-file>

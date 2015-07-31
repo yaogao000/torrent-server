@@ -160,7 +160,7 @@ public abstract class AbstractFirstFilter implements Filter {
 		return !noChecks.contains(method);
 	}
 
-	protected String renderSignature(Map<String, String[]> params, String secret) {
+	public static String renderSignature(Map<String, String[]> params, String secret) {
 		List<String> names = new ArrayList<String>();
 		names.addAll(params.keySet());
 		names.remove(SIG);

@@ -117,7 +117,7 @@ public class CustomerController extends BaseController {
 		}
 
 		// 注销登录
-//		customerSrv.signout(phone, countryCode, token);
+		customerSrv.signout(token);
 
 		return ResponseMessssage.OK();
 	}
