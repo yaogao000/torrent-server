@@ -9,7 +9,7 @@ CREATE TABLE `t_customer` (
   `country_id` smallint(5) unsigned NOT NULL DEFAULT '1' COMMENT '国家ID',
   `city_id` int(20) unsigned NOT NULL DEFAULT '0',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`cid`),
   UNIQUE KEY `Index_phone` (`mobile`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='乘客信息表';
@@ -25,7 +25,7 @@ CREATE TABLE `t_customer_session` (
   `expire_at` bigint unsigned NOT NULL COMMENT 'token 失效 时间点',
   `status` tinyint(3) unsigned DEFAULT '1' COMMENT 'token 是否有效: 0-失效; 1-有效;',
   `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`cid`),
   UNIQUE KEY `AK_Key_token` (`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='乘客的登陆session 流水表\n';
