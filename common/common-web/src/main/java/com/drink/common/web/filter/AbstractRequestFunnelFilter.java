@@ -3,6 +3,7 @@ package com.drink.common.web.filter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,8 +54,14 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 
 		HttpServletRequest request = (HttpServletRequest) req;
 
-		String requestUri = request.getRequestURI();
-		if (!requestFunnels.containsKey(requestUri)) {
+		String requestServletpath = request.getServletPath();
+		// 去除 .do 后缀
+		int index = -1;
+		if ((index = requestServletpath.lastIndexOf(".do")) != -1) {
+			requestServletpath = requestServletpath.substring(0, index);
+		}
+		
+		if (!requestFunnels.containsKey(requestServletpath)) {
 			filterChain.doFilter(req, resp);
 			return;
 		}
@@ -61,7 +69,7 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 		response.setContentType("application/json;charset=UTF-8");
 
-		List<RequestFunnel> requestFunnelList = requestFunnels.get(requestUri);
+		List<RequestFunnel> requestFunnelList = requestFunnels.get(requestServletpath);
 
 		for (RequestFunnel requestFunnel : requestFunnelList) {
 			String[] paramers = requestFunnel.getParameters();
@@ -74,11 +82,9 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 				} else {
 					value = request.getParameter(paramers[i]);
 				}
-
-				if (StringUtils.isBlank(value)) {// spring mvc
-													// 请求参数有默认值，如果值没有设置，则用
-													// DEFAULT
-													// 代替，这样，只要是同一个请求，就会被处理
+				
+				if (StringUtils.isBlank(value)) {
+					// spring mvc 请求参数有默认值，如果值没有设置，则用 DEFAULT 代替，这样，只要是同一个请求，就会被处理
 					values[i] = "df";// default
 				} else {
 					values[i] = value;
@@ -87,13 +93,15 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 
 			String key = String.format(getKeyPrefix() + requestFunnel.getKey(), values);
 
-			if (!hasReachedUpperLimitInSomeTime(key, requestFunnel.getLimit(), requestFunnel.getTime())) {
-				filterChain.doFilter(req, resp);
-			} else {
+			if (hasReachedUpperLimitInSomeTime(key, requestFunnel.getLimit(), requestFunnel.getTime())) {
 				String message = JSONUtils.readObject2String(ResponseMessssage.ERROR(requestFunnel.getCode(), requestFunnel.getMsg()));
 				response.getWriter().println(message);
+				return;//如果达到次数限制，则 不做其他处理
 			}
 		}
+		
+		//如果没有达到次数限制，则交给下一个filter处理
+		filterChain.doFilter(req, resp);
 	}
 
 	@Override
@@ -107,7 +115,8 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 		final StringBuilder builder = new StringBuilder();
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(resouce.getInputStream()));
+			// 指定编码为 utf-8, 防止乱码
+			reader = new BufferedReader(new InputStreamReader(resouce.getInputStream(), Charsets.UTF_8));
 			String line = null;
 			while ((line = reader.readLine()) != null) {
 				builder.append(line);
@@ -173,17 +182,19 @@ public abstract class AbstractRequestFunnelFilter implements Filter {
 				requestFunnel.setMsg(ResponseMessssage.REQ_OVERFLOW.getMessage());
 			}
 
-			String key = requestFunnel.getApi();
+			String requestApi = requestFunnel.getApi();
+			
+			// 去除 .do 后缀
 			int index = -1;
-			if ((index = key.lastIndexOf(".do")) != -1) {
-				key = key.substring(0, index);
+			if ((index = requestApi.lastIndexOf(".do")) != -1) {
+				requestApi = requestApi.substring(0, index);
 			}
 
-			List<RequestFunnel> list = requestFunnels.get(key);
+			List<RequestFunnel> list = requestFunnels.get(requestApi);
 			if (null == list) {
 				list = new ArrayList<>();
 				list.add(requestFunnel);
-				requestFunnels.put(key, list);
+				requestFunnels.put(requestApi, list);
 			} else {
 				list.add(requestFunnel);
 			}

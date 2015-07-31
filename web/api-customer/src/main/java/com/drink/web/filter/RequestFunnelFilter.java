@@ -21,7 +21,7 @@ public class RequestFunnelFilter extends AbstractRequestFunnelFilter {
 	@Qualifier("funnelJedisService")
 	@Autowired
 	private JedisService requestFunnelJedisService;
-	@Value("redis.key.prefix.requestFunnel")
+	@Value("${redis.key.prefix.requestFunnel}")
 	private String keyPrefix;
 
 	@Override
@@ -31,6 +31,6 @@ public class RequestFunnelFilter extends AbstractRequestFunnelFilter {
 
 	@Override
 	protected boolean hasReachedUpperLimitInSomeTime(String key, int limit, int time) {
-		return requestFunnelJedisService.hasReachedUpperlimitInSomeTime(key, limit, time, TimeUnit.MICROSECONDS);
+		return requestFunnelJedisService.hasReachedUpperlimitInSomeTime(key, limit, time, TimeUnit.MINUTES);
 	}
 }
